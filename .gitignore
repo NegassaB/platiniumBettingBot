@@ -1,0 +1,21 @@
+# temp files
+.gitignore~
+..gitignore.un~
+
+# envs
+venv/
+# rope project settings
+
+# mypy
+.mypy_cache/
+
+# vscode files
+.vscode/
+
+# logs
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# other files
+links_for_content
+sms_numbers_sep252020.csv
