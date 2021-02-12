@@ -1,6 +1,7 @@
 # temp files
 .gitignore~
 ..gitignore.un~
+.README.md.un~
 
 # envs
 venv/
