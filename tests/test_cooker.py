@@ -2,34 +2,25 @@ import unittest
 from unittest.mock import patch, Mock, MagicMock
 from src.cooker import Cooker
 from requests import status_codes, exceptions
-from bs4 import element
 
 
 class CookerTestSuites(unittest.TestCase):
     """
     tests the Cooker class.
     """
-    @classmethod
-    def setUpClass(cls):
-        cls.cooker = Cooker("https://viiiiiptips.blogspot.com/")
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.cooker = None
+    def setUp(self):
+        self.cooker = Cooker("https://viiiiiptips.blogspot.com/")
+        with patch('src.cooker.requests', autospec=True) as mock_cooker_requests:
+            self.cooker.get_recipe()
+            self.cooker.sauce.content.return_value = ""
 
     def tearDown(self):
         self.cooker = None
 
-    def test_url(self):
-        self.assertEqual(
-            "https://viiiiiptips.blogspot.com/",
-            self.cooker.source_url
-        )
-
     def test_get_recipe_is_called(self):
-        with patch('src.cooker.requests') as mock_cooker_requests:
+        with patch('src.cooker.requests') as mock_test_cooker_requests:
             self.cooker.get_recipe()
-            mock_cooker_requests.get.assert_called()
+            mock_test_cooker_requests.get.assert_called()
 
     def test_get_recipe_response_is_ok(self):
         with patch('src.cooker.requests') as mock_cooker_requests:
@@ -47,7 +38,6 @@ class CookerTestSuites(unittest.TestCase):
                 self.cooker.get_recipe()
 
     def test_cook_recipe_is_called(self):
-        self.cooker.get_recipe()
         with patch('src.cooker.bs') as mock_cooker_bs:
             self.cooker.cook_recipe()
             mock_cooker_bs.BeautifulSoup.assert_called()
