@@ -77,24 +77,22 @@ class Cooker():
             [type]: [description]
         """
         """
-        todo:
-            now you can use pick_out() to get the data from the rows according to their tds and that is inserted into the
-            list_of_vals. You already have a list_of_keys thus, you gotta merge those to in to the meaty_dict.
-            That will be inserted into the db.
         fix:
-            find a way to remove the empty values inside the list_of_vals
+            you can't have a dict with duplicate keys, find a way to either insert lists or sets.
         """
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
         self.meaty_dict = {}
-        list_of_keys = ["time", "teams", "odds", "country", "3ways", "result"]
+        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
         list_of_vals = []
         table = self.soup.find("table")
         all_rows = table.find_all('tr')
         _, _ = all_rows.pop(0), all_rows.pop(-1)
         while len(all_rows) != 0:
-            row1, row2 = all_rows.pop(), all_rows.pop()
+            row1, row2 = all_rows.pop(0), all_rows.pop(0)
             pick_out(row1)
             pick_out(row2)
+            for k, v in zip(list_of_keys, list_of_vals):
+                self.meaty_dict[k] = v
 
         def pick_out(row):
             """
@@ -106,8 +104,9 @@ class Cooker():
                 that are required.
 
             Returns:
-                [list]: a list_of_vals populated with the values in each row.
+                list: a list_of_vals populated with the values in each row.
             """
             for pickings in row.find_all('td'):
-                # perhaps using row.findChildren('strong').splitlines()
-                return list_of_vals.append(pickings.text.strip())
+                val = pickings.text.strip()
+                if len(val) != 0:
+                    list_of_vals.append(pickings.text.strip())
