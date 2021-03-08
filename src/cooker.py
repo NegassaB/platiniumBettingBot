@@ -14,6 +14,9 @@ logger = logging.getLogger(__name__)
 
 class Cooker():
     """
+    todo:
+        1.
+
     doc:
     Cooker [summary]
 
@@ -71,29 +74,13 @@ class Cooker():
             that bs object into the 'all_rows' ResultSet object.
             From that it pops the 1st and last rows and proceeds to get into a
             while loop that will pop two rows at once and insert the data from
-            those rows into a dict that will contain them.
+            those rows into a tuple that will contain them.
 
         Returns:
             [type]: [description]
         """
         """
-        fix:
-            you can't have a dict with duplicate keys, find a way to either insert lists or sets.
         """
-        self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
-        self.meaty_dict = {}
-        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
-        list_of_vals = []
-        table = self.soup.find("table")
-        all_rows = table.find_all('tr')
-        _, _ = all_rows.pop(0), all_rows.pop(-1)
-        while len(all_rows) != 0:
-            row1, row2 = all_rows.pop(0), all_rows.pop(0)
-            pick_out(row1)
-            pick_out(row2)
-            for k, v in zip(list_of_keys, list_of_vals):
-                self.meaty_dict[k] = v
-
         def pick_out(row):
             """
             This methods is used to pick out texts from the row. These include
@@ -110,3 +97,21 @@ class Cooker():
                 val = pickings.text.strip()
                 if len(val) != 0:
                     list_of_vals.append(pickings.text.strip())
+
+        self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
+        self.meaty_list = []
+        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
+        list_of_vals = []
+        table = self.soup.find("table")
+        all_rows = table.find_all('tr')
+        _, _ = all_rows.pop(0), all_rows.pop(-1)
+        while len(all_rows) != 0:
+            row1, row2 = all_rows.pop(0), all_rows.pop(0)
+            pick_out(row1)
+            pick_out(row2)
+            [self.meaty_list.append(i) for i in zip(list_of_keys, list_of_vals)]
+
+    @classmethod
+    def connect():
+        
+

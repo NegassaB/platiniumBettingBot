@@ -41,20 +41,3 @@ class CookerTestSuites(unittest.TestCase):
         with patch('src.cooker.bs') as mock_cooker_bs:
             self.cooker.cook_recipe()
             mock_cooker_bs.BeautifulSoup.assert_called()
-
-    def test_cook_recipe_returns_dict_with_all_attributes(self):
-        # todo:
-        # check if the keys are similar,
-        # check if the dict itself is similar to the one generated using this one
-        dict_to_check = {
-            "time": None,
-            "teams": None,
-            "odds": None,
-            "country": None,
-            "3ways": None,
-            "result": None
-        }
-        self.cooker.get_recipe()
-        tbl = self.cooker.cook_recipe()
-        mocked_find.assert_called()
-        self.assertEqual(tbl.name, mocked_find.return_value.name)
