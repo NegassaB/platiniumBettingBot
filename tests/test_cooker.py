@@ -11,9 +11,6 @@ class CookerTestSuites(unittest.TestCase):
     """
     def setUp(self):
         self.cooker = Cooker("https://viiiiiptips.blogspot.com/")
-        with patch('src.cooker.requests', autospec=True) as mock_cooker_requests:
-            self.cooker.get_recipe()
-            self.cooker.sauce.content.return_value = ""
 
     def tearDown(self):
         self.cooker = None
@@ -40,6 +37,7 @@ class CookerTestSuites(unittest.TestCase):
 
     def test_cook_recipe_is_called(self):
         with patch('src.cooker.bs') as mock_cooker_bs:
+            self.cooker.get_recipe()
             self.cooker.cook_recipe()
             mock_cooker_bs.BeautifulSoup.assert_called()
 
