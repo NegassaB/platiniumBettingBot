@@ -102,6 +102,7 @@ class Cooker():
         self.meaty_list = []
         list_of_keys = ["time", "teams", "odds", "country", "3ways"]
         list_of_vals = []
+        temp_dict = dict()
         table = self.soup.find("table")
         all_rows = table.find_all('tr')
         _, _ = all_rows.pop(0), all_rows.pop(-1)
@@ -109,9 +110,10 @@ class Cooker():
             row1, row2 = all_rows.pop(0), all_rows.pop(0)
             pick_out(row1)
             pick_out(row2)
-            [self.meaty_list.append(i) for i in zip(list_of_keys, list_of_vals)]
+            self.meaty_list.append(dict(zip(list_of_keys, list_of_vals)))
+
+        return self.meaty_list
 
     @classmethod
-    def connect():
-        
-
+    def connect(none):
+        pass

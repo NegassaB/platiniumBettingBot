@@ -1,4 +1,5 @@
 import unittest
+import pickle
 from unittest.mock import patch, Mock, MagicMock
 from src.cooker import Cooker
 from requests import status_codes, exceptions
@@ -41,3 +42,17 @@ class CookerTestSuites(unittest.TestCase):
         with patch('src.cooker.bs') as mock_cooker_bs:
             self.cooker.cook_recipe()
             mock_cooker_bs.BeautifulSoup.assert_called()
+
+    def test_cook_recipe_with_requests_mocked(self):
+        with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
+            mock_requests.side_effect = None
+            mock_requests.get.return_value = pickle.load(
+                open(
+                    'somethingsomething.xyz',
+                    'rb'
+                )
+            )
+            self.cooker.get_recipe()
+            res = self.cooker.cook_recipe()
+            self.assertIsInstance(res, list)
+            mock_requests.get.assert_called_with("https://viiiiiptips.blogspot.com/")
