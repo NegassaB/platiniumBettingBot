@@ -101,11 +101,11 @@ class Cooker():
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
         self.meaty_list = []
         list_of_keys = ["time", "teams", "odds", "country", "3ways"]
-        list_of_vals = []
         table = self.soup.find("table")
         all_rows = table.find_all('tr')
         _, _ = all_rows.pop(0), all_rows.pop(-1)
         while len(all_rows) != 0:
+            list_of_vals = []
             row1, row2 = all_rows.pop(0), all_rows.pop(0)
             pick_out(row1)
             pick_out(row2)
