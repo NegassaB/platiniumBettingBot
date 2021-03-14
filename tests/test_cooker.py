@@ -1,8 +1,10 @@
-import unittest
+
 import pickle
-from unittest.mock import patch, Mock, MagicMock
+import unittest
+from unittest.mock import MagicMock, Mock, patch
+
+from requests import exceptions, status_codes
 from src.cooker import Cooker
-from requests import status_codes, exceptions
 
 
 class CookerTestSuites(unittest.TestCase):
@@ -58,3 +60,6 @@ class CookerTestSuites(unittest.TestCase):
             self.assertIsInstance(dict_1st, dict)
             self.assertIn("teams", dict_1st.keys())
             mock_requests.get.assert_called_with("https://viiiiiptips.blogspot.com/")
+
+    def test_connect_to_db(self):
+        pass
