@@ -17,8 +17,10 @@ logger = logging.getLogger(__name__)
 class Freezer():
     """
     todo:
-        1. if tables don't exist, create the necessary tables in the code
-        2. build the CRUD operation methods
+        []. build create_table()
+            condn is: if tables don't exist, create the necessary tables in create_table()
+            if it does exist, skip
+        []. build the CRUD operation methods
     Freezer [summary]
 
     Returns:
