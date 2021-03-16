@@ -9,7 +9,10 @@ from src.cooker import Cooker
 
 class CookerTestSuites(unittest.TestCase):
     """
-    tests the Cooker class.
+    CookerTestSuites: tests the Cooker class.
+
+    Args:
+        unittest ([type]): [description]
     """
     def setUp(self):
         self.cooker = Cooker("https://viiiiiptips.blogspot.com/")
