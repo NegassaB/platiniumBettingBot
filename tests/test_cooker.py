@@ -38,8 +38,9 @@ class CookerTestSuites(unittest.TestCase):
                 self.cooker.get_recipe()
 
     def test_cook_recipe_is_called(self):
-        with patch('src.cooker.bs') as mock_cooker_bs:
+        with patch('src.cooker.requests') as mock_cooker_requests:
             self.cooker.get_recipe()
+        with patch('src.cooker.bs') as mock_cooker_bs:
             self.cooker.cook_recipe()
             mock_cooker_bs.BeautifulSoup.assert_called()
 
