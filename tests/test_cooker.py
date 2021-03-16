@@ -1,9 +1,9 @@
 
 import pickle
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import (MagicMock, Mock, patch)
 
-from requests import exceptions, status_codes
+from requests import (exceptions, status_codes)
 from src.cooker import Cooker
 
 

@@ -1,4 +1,5 @@
 import logging
+import datetime
 
 # 3rd party libraries
 import peewee
@@ -60,3 +61,13 @@ class Freezer():
         """
         if not self.freezer.is_closed():
             return self.freezer.close()
+
+
+class BaseModel(peewee.Model):
+
+    class Meta():
+        database = Freezer()
+
+
+class TelegramUser(BaseModel):
+    pass

@@ -1,7 +1,9 @@
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import (MagicMock, patch)
 
-from src.freezer import Freezer
+import peewee
+
+from src.freezer import (Freezer, BaseModel, TelegramUser)
 
 
 class FreezerTestSuites(unittest.TestCase):
@@ -28,3 +30,11 @@ class FreezerTestSuites(unittest.TestCase):
 
     def test_insert_a_record(self):
         pass
+
+
+class BaseModelTestSuites(unittest.TestCase):
+
+    def test_telegramuser_instance_basemodel(self):
+        self.telegram_user = TelegramUser()
+        self.assertIsInstance(self.telegram_user, BaseModel)
+        self.assertIsInstance(self.telegram_user, peewee.Model)
