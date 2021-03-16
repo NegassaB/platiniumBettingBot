@@ -60,7 +60,5 @@ class CookerTestSuites(unittest.TestCase):
             dict_1st = self.cooker.meaty_list.pop(0)
             self.assertIsInstance(dict_1st, dict)
             self.assertIn("teams", dict_1st.keys())
+            self.assertIn("1.44", dict_1st.values())
             mock_requests.get.assert_called_with("https://viiiiiptips.blogspot.com/")
-
-    def test_connect_to_db(self):
-        pass
