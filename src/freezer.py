@@ -1,5 +1,5 @@
 import logging
-import datetime
+from datetime import (datetime, timezone)
 
 # 3rd party libraries
 import peewee
@@ -35,6 +35,7 @@ class Freezer():
         """
         __init__ [summary]
         """
+        # mock_db.return_value.connect = peewee.MySQLDatabase.connect()
         self.freezer = peewee.MySQLDatabase(
             database=Freezer.db_name,
             user=Freezer.db_username,
@@ -50,7 +51,8 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        return self.freezer.connect()
+        if self.freezer.connect():
+            print('\nconnected\n')
 
     def close_freezer(self):
         """
@@ -60,7 +62,10 @@ class Freezer():
             [type]: [description]
         """
         if not self.freezer.is_closed():
-            return self.freezer.close()
+            self.freezer.close()
+
+    def create_table(self):
+        pass
 
 
 class BaseModel(peewee.Model):
@@ -69,5 +74,10 @@ class BaseModel(peewee.Model):
         database = Freezer()
 
 
-class TelegramUser(BaseModel):
-    pass
+class PlatiniumBotUser(BaseModel):
+    bot_user_id = peewee.AutoField(primary_key=True, null=False)
+    user_telegram_id = peewee.IntegerField(null=False, unique=True)
+    bot_user_name = peewee.CharField(max_length=255)
+
+    bot_user_joined_timestamp = peewee.DateTimeField(null=False, default=datetime.now(tz=timezone.utc))
+    bot_user_active = peewee.BooleanField(default=False, null=False)
