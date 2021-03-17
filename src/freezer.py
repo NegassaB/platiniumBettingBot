@@ -52,7 +52,7 @@ class Freezer():
             [type]: [description]
         """
         if self.freezer.connect():
-            print('\nconnected\n')
+            print('\nconnected to db\n')
 
     def close_freezer(self):
         """
@@ -61,15 +61,28 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        if not self.freezer.is_closed():
-            self.freezer.close()
+        # if not self.freezer.close():
+        if self.freezer.close():
+            print('\nclosed cxn to db\n')
 
     def create_table(self):
         pass
 
 
 class BaseModel(peewee.Model):
+    """
+    todo:
+        [ ] - PlatiniumBotUser attributes:
+                id, telg_id, name, joined_timestamp, active
+        [ ] - PlatiniumBotContent attributes:
+                id, time, teams, odds, country, 3 ways, result, timestamp
+        [ ] - PlatiniumContentMessage attributes:
+                id, content(fk_PlatiniumBotContent), user(fk_PlatiniumBotUser), sent_timestamp
+    BaseModel [summary]
 
+    Args:
+        peewee ([type]): [description]
+    """
     class Meta():
         database = Freezer()
 
@@ -79,5 +92,45 @@ class PlatiniumBotUser(BaseModel):
     user_telegram_id = peewee.IntegerField(null=False, unique=True)
     bot_user_name = peewee.CharField(max_length=255)
 
-    bot_user_joined_timestamp = peewee.DateTimeField(null=False, default=datetime.now(tz=timezone.utc))
     bot_user_active = peewee.BooleanField(default=False, null=False)
+    bot_user_joined_timestamp = peewee.DateTimeField(
+        null=False,
+        default=datetime.now(tz=timezone.utc)
+    )
+
+
+class PlatiniumBotContent(BaseModel):
+    platinium_content_id = peewee.AutoField(primary_key=True, null=False)
+    platinium_content_time = peewee.CharField(50)
+    platinium_content_odds = peewee.CharField(10)
+    platinium_content_country = peewee.CharField(25)
+    platinium_content_3ways = peewee.CharField(15)
+    platinium_content_result = peewee.CharField(max_length=15)
+
+    platinium_content_timestamp = peewee.DateTimeField(
+        null=False,
+        default=datetime.now(tz=timezone.utc)
+    )
+
+
+class PlatiniumMessage(BaseModel):
+    platinium_msg_id = peewee.AutoField(primary_key=True, null=False)
+    platinium_msg_content = peewee.ForeignKeyField(
+        PlatiniumBotContent,
+        null=False,
+        related_name="fk_platinium_content",
+        on_update='cascade',
+        on_delete='restrict'
+    )
+    platinium_msg_user = peewee.ForeignKeyField(
+        PlatiniumBotUser,
+        null=False,
+        related_name='fk_platinium_bot_user',
+        on_update='cascade',
+        on_delete='restrict'
+    )
+
+    platinium_msg_sent_timestamp = peewee.DateTimeField(
+        null=False,
+        default=datetime.now(tz=timezone.utc)
+    )

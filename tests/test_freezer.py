@@ -19,17 +19,15 @@ class FreezerTestSuites(unittest.TestCase):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.freezer = Freezer()
             mock_db.assert_called()
-            mock_db.return_value.connect = mock_db.connect()
             self.freezer.open_freezer()
-            mock_db.connect.assert_called()
+            mock_db.return_value.connect.assert_called()
 
-
-    # @patch('src.freezer.peewee', autospec=True, spec_set=True)
-    # def test_create_table(self, mock_db):
-    #     x = mock_db.MySQL
-
-    # def test_insert_a_record(self):
-    #     pass
+    def test_close_freezer(self):
+        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
+            self.freezer = Freezer()
+            self.freezer.open_freezer()
+            self.freezer.close_freezer()
+            mock_db.return_value.close.assert_called()
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
