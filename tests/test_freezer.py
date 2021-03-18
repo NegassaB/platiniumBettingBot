@@ -1,7 +1,14 @@
 import unittest
 from unittest.mock import (MagicMock, patch)
 
-from src.freezer import (Freezer, BaseModel, PlatiniumBotUser, peewee)
+from src.freezer import (
+    peewee,
+    Freezer,
+    BaseModel,
+    PlatiniumBotUser,
+    PlatiniumMessage,
+    PlatiniumBotContent
+)
 
 
 class FreezerTestSuites(unittest.TestCase):
@@ -34,10 +41,16 @@ class PlatiniumBotUserModelTestSuites(unittest.TestCase):
 
     def setUp(self):
         self.platinium_bot_user = PlatiniumBotUser()
+        self.platinium_bot_msg = PlatiniumMessage()
+        self.platinium_bot_cont = PlatiniumBotContent()
 
-    def test_telegramuser_instance_basemodel(self):
+    def test_models_instance_basemodel(self):
         self.assertIsInstance(self.platinium_bot_user, BaseModel)
         self.assertIsInstance(self.platinium_bot_user, peewee.Model)
+        self.assertIsInstance(self.platinium_bot_msg, BaseModel)
+        self.assertIsInstance(self.platinium_bot_msg, peewee.Model)
+        self.assertIsInstance(self.platinium_bot_cont, BaseModel)
+        self.assertIsInstance(self.platinium_bot_cont, peewee.Model)
 
     def test_telegramuser_tables_data(self):
         pass
