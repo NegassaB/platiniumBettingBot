@@ -35,7 +35,6 @@ class Freezer():
         """
         __init__ [summary]
         """
-        # mock_db.return_value.connect = peewee.MySQLDatabase.connect()
         self.freezer = peewee.MySQLDatabase(
             database=Freezer.db_name,
             user=Freezer.db_username,
@@ -72,16 +71,13 @@ class Freezer():
 class BaseModel(peewee.Model):
     """
     todo:
-        [ ] - PlatiniumBotUser attributes:
-                id, telg_id, name, joined_timestamp, active
-        [ ] - PlatiniumBotContent attributes:
-                id, time, teams, odds, country, 3 ways, result, timestamp
-        [ ] - PlatiniumContentMessage attributes:
-                id, content(fk_PlatiniumBotContent), user(fk_PlatiniumBotUser), sent_timestamp
+        [ ] - override update() PlatiniumMessage to update platinium_content_result when data b/mes available
+    hack[ ] - for the above perhaps might be to override something in the PlatiniumBotContent to return the full
+                content instead of the id number
     BaseModel [summary]
 
     Args:
-        peewee ([type]): [description]
+        peewee.Model ([type]): [description]
     """
     class Meta():
         database = Freezer()
