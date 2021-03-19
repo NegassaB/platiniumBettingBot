@@ -18,10 +18,12 @@ logger = logging.getLogger(__name__)
 class Freezer():
     """
     todo:
-        []. build create_table()
+        [x]. build create_table()
             condn is: if tables don't exist, create the necessary tables in create_table()
             if it does exist, skip
-        []. build the CRUD operation methods
+        [ ]. build the CRUD operation methods
+    hack[ ]. perhaps the bot_save() method doesn't only save tables but every operation that has been conducted.
+             don't know how that can be pulled off tho. Seems the better way is to call save on every operation.
     Freezer [summary]
 
     Returns:
@@ -60,11 +62,31 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        # if not self.freezer.close():
         if self.freezer.close():
             print('\nclosed cxn to db\n')
 
-    def create_table(self):
+    def create_bot_tables(self):
+        """
+        create_bot_tables: checks for existence and if they don't exist, creates the database
+                        tables that the bot uses.
+        """
+        self.open_freezer()
+        tbl_list = []
+        if not self.freezer.table_exists("table_PlatiniumBotUser"):
+            tbl_list.append(PlatiniumBotUser)
+        if not self.freezer.table_exists("table_PlatiniumBotContent"):
+            tbl_list.append(PlatiniumBotContent)
+        if not self.freezer.table_exists("table_PlatiniumBotMessage"):
+            tbl_list.append(PlatiniumBotMessage)
+
+        try:
+            self.freezer.create_tables(tbl_list)
+        except Exception as e:
+            logger.exception(f"exception occured -- {e}", exc_info=True)
+        finally:
+            self.close_freezer()
+
+    def save_bot_tables(self):
         pass
 
 
@@ -74,6 +96,7 @@ class BaseModel(peewee.Model):
         [ ] - override update() PlatiniumMessage to update platinium_content_result when data b/mes available
     hack[ ] - for the above perhaps might be to override something in the PlatiniumBotContent to return the full
                 content instead of the id number
+        [ ] - give every model it's own method to call the save, update, etc methods.
     BaseModel [summary]
 
     Args:
@@ -94,31 +117,39 @@ class PlatiniumBotUser(BaseModel):
         default=datetime.now(tz=timezone.utc)
     )
 
+    class Meta():
+        table_name = "table_PlatiniumBotUser"
+
 
 class PlatiniumBotContent(BaseModel):
     platinium_content_id = peewee.AutoField(primary_key=True, null=False)
-    platinium_content_time = peewee.CharField(50)
+    platinium_content_time = peewee.CharField(20)
+    platinium_content_teams = peewee.TextField()
     platinium_content_odds = peewee.CharField(10)
     platinium_content_country = peewee.CharField(25)
     platinium_content_3ways = peewee.CharField(15)
-    platinium_content_result = peewee.CharField(max_length=15)
+    platinium_content_result = peewee.TextField()
 
     platinium_content_timestamp = peewee.DateTimeField(
         null=False,
         default=datetime.now(tz=timezone.utc)
     )
 
+    class Meta():
+        table_name = "table_PlatiniumBotContent"
 
-class PlatiniumMessage(BaseModel):
-    platinium_msg_id = peewee.AutoField(primary_key=True, null=False)
-    platinium_msg_content = peewee.ForeignKeyField(
+
+class PlatiniumBotMessage(BaseModel):
+    platinium_bot_msg_id = peewee.AutoField(primary_key=True, null=False)
+    platinium_bot_msg_content = peewee.ForeignKeyField(
         PlatiniumBotContent,
         null=False,
         related_name="fk_platinium_content",
         on_update='cascade',
-        on_delete='restrict'
+        on_delete='restrict',
+        backref="posted_content"
     )
-    platinium_msg_user = peewee.ForeignKeyField(
+    platinium_bot_msg_user = peewee.ForeignKeyField(
         PlatiniumBotUser,
         null=False,
         related_name='fk_platinium_bot_user',
@@ -126,7 +157,10 @@ class PlatiniumMessage(BaseModel):
         on_delete='restrict'
     )
 
-    platinium_msg_sent_timestamp = peewee.DateTimeField(
+    platinium_bot_msg_sent_timestamp = peewee.DateTimeField(
         null=False,
         default=datetime.now(tz=timezone.utc)
     )
+
+    class Meta():
+        table_name = "table_PlatiniumBotMessage"
