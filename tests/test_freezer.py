@@ -14,13 +14,11 @@ from src.freezer import (
 class FreezerTestSuites(unittest.TestCase):
     """
     todo:
-        [x]. in setUp() open_freezer()
-        [x]. in the tearDown() close_freezer()
 
     FreezerTestSuites: tests the Freezer class.
 
     Args:
-        unittest ([type]): [description]
+        unittest (TestCase): A class whose instances are single test cases that are inherited.
     """
     def tearDown(self):
         self.test_freezer_obj.close_freezer()
@@ -39,19 +37,30 @@ class FreezerTestSuites(unittest.TestCase):
     def test_close_freezer(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
+            mock_db.side_effect = peewee.PeeweeException
             self.test_freezer_obj.open_freezer()
             self.test_freezer_obj.close_freezer()
 
             mock_db.return_value.close.assert_called()
 
     def test_create_bot_tables(self):
+        # hack remember that whenever you act on a mock it always returns a mock, thus when you call table_exists
+        # on the mock it returns true and continues on executing the code. What you need to do is find a way to make
+        # mock_db as realistic as possible by populating it with whatever you're testing and the proceed from that.
+        # todo find a way to get a full db into the mock
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
-            self.test_freezer_obj.open_freezer()
+            mock_db.side_effect = peewee.PeeweeException
+            self.test_freezer_obj.freezer.table_exists.return_value = False
             self.test_freezer_obj.create_bot_tables()
 
-            mock_db.return_value.table_exists.assert_called()
+            mock_db.return_value.table_exists.assert_called_with(
+                "table_PlatiniumBotMessage"
+            )
             mock_db.return_value.create_tables.assert_called()
+            mock_db.return_value.create_tables.assert_called_with(
+                [PlatiniumBotUser, PlatiniumBotContent, PlatiniumBotMessage]
+            )
 
     def test_tables_existence(self):
         """
@@ -60,11 +69,12 @@ class FreezerTestSuites(unittest.TestCase):
         """
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
-            self.test_freezer_obj.open_freezer()
+            mock_db.side_effect = peewee.PeeweeException
             self.test_freezer_obj.create_bot_tables()
             tbls = self.test_freezer_obj.freezer.get_tables()
 
             mock_db.return_value.get_tables.assert_called_once()
+            mock_db.return_value.get_tables = ['']
             # self.assertIn("table_PlatiniumBotUser", tbls)
 
 

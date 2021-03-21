@@ -12,7 +12,7 @@ class CookerTestSuites(unittest.TestCase):
     CookerTestSuites: tests the Cooker class.
 
     Args:
-        unittest ([type]): [description]
+        unittest (TestCase): A class whose instances are single test cases that are inherited.
     """
     def setUp(self):
         self.cooker = Cooker("https://viiiiiptips.blogspot.com/")

@@ -9,7 +9,7 @@ log_fmt = "%(asctime)s - %(funcName)s - %(name)s - %(levelname)s - %(message)s"
 # enable logging
 logging.basicConfig(
     format=log_fmt,
-    level=logging.INFO
+    level=logging.DEBUG
 )
 
 logger = logging.getLogger(__name__)
@@ -81,6 +81,9 @@ class Freezer():
 
         try:
             self.freezer.create_tables(tbl_list)
+            print('doing something')
+        except peewee.PeeweeException as pwe:
+            logger.exception(f"PeeweeException occured -- {pwe}", exc_info=True)
         except Exception as e:
             logger.exception(f"exception occured -- {e}", exc_info=True)
         finally:
