@@ -71,11 +71,14 @@ class FreezerTestSuites(unittest.TestCase):
             self.test_freezer_obj = Freezer()
             mock_db.side_effect = peewee.PeeweeException
             self.test_freezer_obj.create_bot_tables()
-            tbls = self.test_freezer_obj.freezer.get_tables()
 
-            mock_db.return_value.get_tables.assert_called_once()
-            mock_db.return_value.get_tables = ['']
-            # self.assertIn("table_PlatiniumBotUser", tbls)
+            self.test_freezer_obj.freezer.get_tables.return_value = [
+                'table_PlatiniumBotUser',
+                'table_PlatiniumBotContent',
+                'table_PlatiniumBotMessage'
+            ]
+            tbls = self.test_freezer_obj.freezer.get_tables()
+            self.assertIn("table_PlatiniumBotUser", tbls)
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
