@@ -50,12 +50,10 @@ class CookerTestSuites(unittest.TestCase):
     def test_cook_recipe_with_requests_mocked(self):
         with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
             mock_requests.side_effect = None
-            mock_requests.get.return_value = pickle.load(
-                open(
-                    'somethingsomething.xyz',
-                    'rb'
-                )
-            )
+            f = open('somethingsomething.xyz', 'rb')
+            mock_requests.get.return_value = pickle.load(f)
+            f.close()
+
             self.cooker.get_recipe()
             self.cooker.cook_recipe()
             self.assertIsInstance(self.cooker.meaty_list, list)

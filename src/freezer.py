@@ -25,6 +25,7 @@ class Freezer():
         [ ]. build add_new_content()
             in this find a way to to get the actual message instead of the fk
         [ ]. build add_new_message()
+        [ ]. build a way to update platinium_content_posted_timestamp after posting
         [ ]. build the CRUD operation methods
 
     Freezer [summary]
@@ -79,8 +80,6 @@ class Freezer():
             tbl_list.append(PlatiniumBotUser)
         if not self.freezer.table_exists("table_PlatiniumBotContent"):
             tbl_list.append(PlatiniumBotContent)
-        if not self.freezer.table_exists("table_PlatiniumBotMessage"):
-            tbl_list.append(PlatiniumBotMessage)
 
         if (tbl_list) != 0:
             try:
@@ -92,7 +91,7 @@ class Freezer():
             finally:
                 self.close_freezer()
 
-    def create_new_bot_user(self, telegram_id, telegram_name):
+    def create_new_bot_user(self, telegram_id, telegram_name, phone=None):
         """
         hack:
             perhaps do all the CRUD operations in this class, just use the below ones as models.
@@ -110,15 +109,25 @@ class Freezer():
             telegram_id ([type]): [description]
             telegram_name ([type]): [description]
         """
-        self.freezer.open_freezer()
+        self.open_freezer()
         try:
-            PlatiniumBotUser.insert(user_telegram_id=telegram_id, bot_user_name=telegram_name).execute()
+            if phone is not None:
+                PlatiniumBotUser.create(
+                    user_telegram_id=telegram_id,
+                    bot_user_name=telegram_name,
+                    bot_user_phone=phone
+                )
+            else:
+                PlatiniumBotUser.create(
+                    user_telegram_id=telegram_id,
+                    bot_user_name=telegram_name
+                )
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
             logger.exception(f"Exception occurred -- {e}", exc_info=True)
         finally:
-            self.freezer.close_freezer()
+            self.close_freezer()
 
 
 class BaseFarm(peewee.Model):
@@ -141,6 +150,7 @@ class PlatiniumBotUser(BaseFarm):
     bot_user_id = peewee.AutoField(primary_key=True, null=False)
     user_telegram_id = peewee.IntegerField(null=False, unique=True)
     bot_user_name = peewee.CharField(max_length=255)
+    bot_user_phone = peewee.CharField(max_length=20, default="00000000000000")
 
     bot_user_active = peewee.BooleanField(default=True, null=False)
     bot_user_joined_timestamp = peewee.DateTimeField(
