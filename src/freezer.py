@@ -21,9 +21,12 @@ class Freezer():
         [x]. build create_table()
             condn is: if tables don't exist, create the necessary tables in create_table()
             if it does exist, skip
+        [ ]. build create_platinium_bot_user()
+        [ ]. build add_new_content()
+            in this find a way to to get the actual message instead of the fk
+        [ ]. build add_new_message()
         [ ]. build the CRUD operation methods
-    hack[ ]. perhaps the bot_save() method doesn't only save tables but every operation that has been conducted.
-             don't know how that can be pulled off tho. Seems the better way is to call save on every operation.
+
     Freezer [summary]
 
     Returns:
@@ -79,21 +82,46 @@ class Freezer():
         if not self.freezer.table_exists("table_PlatiniumBotMessage"):
             tbl_list.append(PlatiniumBotMessage)
 
+        if (tbl_list) != 0:
+            try:
+                self.freezer.create_tables(tbl_list)
+            except peewee.PeeweeException as pex:
+                logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
+            except Exception as e:
+                logger.exception(f"exception occurred -- {e}", exc_info=True)
+            finally:
+                self.close_freezer()
+
+    def create_new_bot_user(self, telegram_id, telegram_name):
+        """
+        hack:
+            perhaps do all the CRUD operations in this class, just use the below ones as models.
+            so in this one you create a new platiniumbotuser instance and save it, when you need to update it
+            you call the update method found here.
+
+            User.create(name="Kiran", age=19)
+            q = User.insert(name='Lata', age=20)
+            q.execute()
+            db.close()
+
+        create_new_bot_user [summary]
+
+        Args:
+            telegram_id ([type]): [description]
+            telegram_name ([type]): [description]
+        """
+        self.freezer.open_freezer()
         try:
-            self.freezer.create_tables(tbl_list)
-            print('doing something')
-        except peewee.PeeweeException as pwe:
-            logger.exception(f"PeeweeException occured -- {pwe}", exc_info=True)
+            PlatiniumBotUser.insert(user_telegram_id=telegram_id, bot_user_name=telegram_name).execute()
+        except peewee.PeeweeException as pex:
+            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
-            logger.exception(f"exception occured -- {e}", exc_info=True)
+            logger.exception(f"Exception occurred -- {e}", exc_info=True)
         finally:
-            self.close_freezer()
-
-    def save_bot_tables(self):
-        pass
+            self.freezer.close_freezer()
 
 
-class BaseModel(peewee.Model):
+class BaseFarm(peewee.Model):
     """
     todo:
         [ ] - override update() PlatiniumMessage to update platinium_content_result when data b/mes available
@@ -109,12 +137,12 @@ class BaseModel(peewee.Model):
         database = Freezer()
 
 
-class PlatiniumBotUser(BaseModel):
+class PlatiniumBotUser(BaseFarm):
     bot_user_id = peewee.AutoField(primary_key=True, null=False)
     user_telegram_id = peewee.IntegerField(null=False, unique=True)
     bot_user_name = peewee.CharField(max_length=255)
 
-    bot_user_active = peewee.BooleanField(default=False, null=False)
+    bot_user_active = peewee.BooleanField(default=True, null=False)
     bot_user_joined_timestamp = peewee.DateTimeField(
         null=False,
         default=datetime.now(tz=timezone.utc)
@@ -123,47 +151,43 @@ class PlatiniumBotUser(BaseModel):
     class Meta():
         table_name = "table_PlatiniumBotUser"
 
+    def get_platinium_bot_user(self):
+        pass
 
-class PlatiniumBotContent(BaseModel):
+    def update_patinium_bot_user(self):
+        pass
+
+    def delete_platinium_bot_user(self):
+        pass
+
+
+class PlatiniumBotContent(BaseFarm):
     platinium_content_id = peewee.AutoField(primary_key=True, null=False)
     platinium_content_time = peewee.CharField(20)
     platinium_content_teams = peewee.TextField()
     platinium_content_odds = peewee.CharField(10)
     platinium_content_country = peewee.CharField(25)
     platinium_content_3ways = peewee.CharField(15)
+    # todo update this when results b/me available after you scrape it
     platinium_content_result = peewee.TextField()
 
-    platinium_content_timestamp = peewee.DateTimeField(
+    # todo update this when the content is posted
+    platinium_content_posted_timestamp = peewee.DateTimeField(
         null=False,
-        default=datetime.now(tz=timezone.utc)
+        default=datetime.now(tz=timezone.utc),
     )
 
     class Meta():
         table_name = "table_PlatiniumBotContent"
 
+    def add_platinium_bot_content(self):
+        pass
 
-class PlatiniumBotMessage(BaseModel):
-    platinium_bot_msg_id = peewee.AutoField(primary_key=True, null=False)
-    platinium_bot_msg_content = peewee.ForeignKeyField(
-        PlatiniumBotContent,
-        null=False,
-        related_name="fk_platinium_content",
-        on_update='cascade',
-        on_delete='restrict',
-        backref="posted_content"
-    )
-    platinium_bot_msg_user = peewee.ForeignKeyField(
-        PlatiniumBotUser,
-        null=False,
-        related_name='fk_platinium_bot_user',
-        on_update='cascade',
-        on_delete='restrict'
-    )
+    def get_platinium_bot_content(self):
+        pass
 
-    platinium_bot_msg_sent_timestamp = peewee.DateTimeField(
-        null=False,
-        default=datetime.now(tz=timezone.utc)
-    )
+    def update_patinium_bot_content(self):
+        pass
 
-    class Meta():
-        table_name = "table_PlatiniumBotMessage"
+    def delete_platinium_bot_content(self):
+        pass

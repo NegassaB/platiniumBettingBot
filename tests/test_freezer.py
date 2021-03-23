@@ -4,7 +4,7 @@ from unittest.mock import (MagicMock, patch)
 from src.freezer import (
     peewee,
     Freezer,
-    BaseModel,
+    BaseFarm,
     PlatiniumBotUser,
     PlatiniumBotMessage,
     PlatiniumBotContent
@@ -62,23 +62,11 @@ class FreezerTestSuites(unittest.TestCase):
                 [PlatiniumBotUser, PlatiniumBotContent, PlatiniumBotMessage]
             )
 
-    def test_tables_existence(self):
-        """
-        todo:
-        check if the tables are actually in the db using this method.
-        """
+    def test_create_new_bot_user(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
-            mock_db.side_effect = peewee.PeeweeException
-            self.test_freezer_obj.create_bot_tables()
-
-            self.test_freezer_obj.freezer.get_tables.return_value = [
-                'table_PlatiniumBotUser',
-                'table_PlatiniumBotContent',
-                'table_PlatiniumBotMessage'
-            ]
-            tbls = self.test_freezer_obj.freezer.get_tables()
-            self.assertIn("table_PlatiniumBotUser", tbls)
+            self.test_freezer_obj.open_freezer()
+            # self.test_freezer_obj.freezer.
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
@@ -89,11 +77,11 @@ class PlatiniumBotUserModelTestSuites(unittest.TestCase):
         self.platinium_bot_cont = PlatiniumBotContent()
 
     def test_models_instance_basemodel(self):
-        self.assertIsInstance(self.platinium_bot_user, BaseModel)
+        self.assertIsInstance(self.platinium_bot_user, BaseFarm)
         self.assertIsInstance(self.platinium_bot_user, peewee.Model)
-        self.assertIsInstance(self.platinium_bot_msg, BaseModel)
+        self.assertIsInstance(self.platinium_bot_msg, BaseFarm)
         self.assertIsInstance(self.platinium_bot_msg, peewee.Model)
-        self.assertIsInstance(self.platinium_bot_cont, BaseModel)
+        self.assertIsInstance(self.platinium_bot_cont, BaseFarm)
         self.assertIsInstance(self.platinium_bot_cont, peewee.Model)
 
     def test_telegramuser_tables_data(self):
