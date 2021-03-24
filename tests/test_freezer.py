@@ -19,6 +19,15 @@ class FreezerTestSuites(unittest.TestCase):
     Args:
         unittest (TestCase): A class whose instances are single test cases that are inherited.
     """
+    def setUp(self):
+        self.tlg_user_id = 355355326
+        # self.tlg_username = None
+        self.tlg_username = "Gadd"
+        self.tlg_first_name = "Negassa"
+        # self.tlg_phone = None
+        self.tlg_phone = "+251911985365"
+        self.active_status = False
+
     def tearDown(self):
         self.test_freezer_obj.close_freezer()
         self.test_freezer_obj = None
@@ -62,61 +71,71 @@ class FreezerTestSuites(unittest.TestCase):
     def test_create_new_bot_user(self):
         with patch("src.freezer.peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
-            tlg_user_id = 355355326
-            # tlg_username = None
-            tlg_username = "Gadd"
-            tlg_first_name = "Negassa"
-            # tlg_phone = None
-            tlg_phone = "+251911985365"
             with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
-                if tlg_username is None and tlg_phone is None:
-                    self.test_freezer_obj.create_new_bot_user(
-                        tlg_user_id,
-                        tlg_first_name
+                if self.tlg_username is None and self.tlg_phone is None:
+                    self.test_freezer_obj.add_new_bot_user(
+                        self.tlg_user_id,
+                        self.tlg_first_name
                     )
 
                     mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=tlg_user_id,
-                        bot_user_name=tlg_first_name
+                        user_telegram_id=self.tlg_user_id,
+                        bot_user_name=self.tlg_first_name
                     )
                     print("both username & phone ARE NONE")
-                elif tlg_username is None and tlg_phone is not None:
+                elif self.tlg_username is None and self.tlg_phone is not None:
                     self.test_freezer_obj.create_new_bot_user(
-                        telegram_id=tlg_user_id,
-                        telegram_name=tlg_first_name,
-                        phone=tlg_phone
+                        telegram_id=self.tlg_user_id,
+                        telegram_name=self.tlg_first_name,
+                        phone=self.tlg_phone
                     )
 
                     mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=tlg_user_id,
-                        bot_user_name=tlg_first_name,
-                        bot_user_phone=tlg_phone
+                        user_telegram_id=self.tlg_user_id,
+                        bot_user_name=self.tlg_first_name,
+                        bot_user_phone=self.tlg_phone
                     )
                     print("phone NOT NONE")
-                elif tlg_phone is None and tlg_username is not None:
+                elif self.tlg_phone is None and self.tlg_username is not None:
                     self.test_freezer_obj.create_new_bot_user(
-                        telegram_id=tlg_user_id,
-                        telegram_name=tlg_username
+                        telegram_id=self.tlg_user_id,
+                        telegram_name=self.tlg_username
                     )
 
                     mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=tlg_user_id,
-                        bot_user_name=tlg_username
+                        user_telegram_id=self.tlg_user_id,
+                        bot_user_name=self.tlg_username
                     )
                     print("username NOT NONE")
                 else:
-                    self.test_freezer_obj.create_new_bot_user(
-                        telegram_id=tlg_user_id,
-                        telegram_name=tlg_username,
-                        phone=tlg_phone
+                    self.test_freezer_obj.add_new_bot_user(
+                        telegram_id=self.tlg_user_id,
+                        telegram_name=self.tlg_username,
+                        phone=self.tlg_phone
                     )
 
                     mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=tlg_user_id,
-                        bot_user_name=tlg_username,
-                        bot_user_phone=tlg_phone
+                        user_telegram_id=self.tlg_user_id,
+                        bot_user_name=self.tlg_username,
+                        bot_user_phone=self.tlg_phone
                     )
                     print("both username & phone NOT NONE")
+
+    # def test_update_bot_user(self):
+    #     with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
+    #         self.test_freezer_obj = Freezer()
+    #         with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
+    #             self.test_freezer_obj.update_bot_user(active_status=self.active_status, telegram_id=self.tlg_user_id)
+
+    #             mock_PBU_model.update.assert_called_with(active_status=self.active_status)
+
+    def test_get_bot_user(self):
+        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
+            self.test_freezer_obj = Freezer()
+            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
+                self.test_freezer_obj.get_bot_user(telegram_id=self.tlg_user_id)
+
+                mock_PBU_model.select.assert_called_with(telegram_id=self.tlg_user_id)
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):

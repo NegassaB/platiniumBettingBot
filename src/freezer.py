@@ -91,13 +91,9 @@ class Freezer():
             finally:
                 self.close_freezer()
 
-    def create_new_bot_user(self, telegram_id, telegram_name, phone=None):
+    def add_new_bot_user(self, telegram_id, telegram_name, phone=None):
         """
         hack:
-            perhaps do all the CRUD operations in this class, just use the below ones as models.
-            so in this one you create a new platiniumbotuser instance and save it, when you need to update it
-            you call the update method found here.
-
             User.create(name="Kiran", age=19)
             q = User.insert(name='Lata', age=20)
             q.execute()
@@ -129,6 +125,23 @@ class Freezer():
         finally:
             self.close_freezer()
 
+    def update_bot_user(self, active_status, telegram_id):
+        self.open_freezer()
+        # try:
+        #     PlatiniumBotUser.update(bot_user_active=active_status)
+        pass
+
+    def get_bot_user(self, telegram_id):
+        self.open_freezer()
+        try:
+            pass
+        except peewee.PeeweeException as pex:
+            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
+        except Exception as e:
+            logger.exception(f"Exception occurred -- {e}", exc_info=True)
+        finally:
+            self.close_freezer()
+
 
 class BaseFarm(peewee.Model):
     """
@@ -150,7 +163,10 @@ class PlatiniumBotUser(BaseFarm):
     bot_user_id = peewee.AutoField(primary_key=True, null=False)
     user_telegram_id = peewee.IntegerField(null=False, unique=True)
     bot_user_name = peewee.CharField(max_length=255)
-    bot_user_phone = peewee.CharField(max_length=20, default="00000000000000")
+    bot_user_phone = peewee.CharField(
+        max_length=20,
+        default="00000000000000"
+    )
 
     bot_user_active = peewee.BooleanField(default=True, null=False)
     bot_user_joined_timestamp = peewee.DateTimeField(
