@@ -1,4 +1,6 @@
 import unittest
+import datetime
+from datetime import timezone
 from unittest.mock import (MagicMock, patch)
 
 from src.freezer import (
@@ -133,9 +135,26 @@ class FreezerTestSuites(unittest.TestCase):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
             with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
-                self.test_freezer_obj.get_bot_user(telegram_id=self.tlg_user_id)
+                # mock_PBU_model.select.return_value = PlatiniumBotUser(
+                #     bot_user_id=1,
+                #     user_telegram_id=self.tlg_user_id,
+                #     bot_user_name=self.tlg_username,
+                #     bot_user_phone=self.tlg_phone,
+                #     bot_user_active=True,
+                #     bot_user_joined_timestamp=datetime.datetime.now(
+                #         tz=timezone.utc
+                #     )
+                # )
+                mock_PBU_model.select.return_value = PlatiniumBotUser(
+                    user_telegram_id=self.tlg_user_id,
+                    bot_user_name=self.tlg_username,
+                    bot_user_phone=self.tlg_phone
+                )
 
-                mock_PBU_model.select.assert_called_with(telegram_id=self.tlg_user_id)
+                user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+
+                mock_PBU_model.select.assert_called_with(self.tlg_user_id)
+                self.assertEqual(user.user_telegram_id, self.tlg_user_id)
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):

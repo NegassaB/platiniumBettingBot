@@ -132,9 +132,18 @@ class Freezer():
         pass
 
     def get_bot_user(self, telegram_id):
+        """
+        get_bot_user [summary]
+
+        Args:
+            telegram_id (int): the telegram id of the user that is required.
+
+        Returns:
+            PlatiniumBotUser: an instance of PlatiniumBotUser that contains the required data.
+        """
         self.open_freezer()
         try:
-            pass
+            return PlatiniumBotUser.select(telegram_id)
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
