@@ -155,6 +155,7 @@ class FreezerTestSuites(unittest.TestCase):
 
                 mock_PBU_model.select.assert_called_with(self.tlg_user_id)
                 self.assertEqual(user.user_telegram_id, self.tlg_user_id)
+                self.assertEqual(user.bot_user_name, self.tlg_username)
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
