@@ -126,10 +126,37 @@ class Freezer():
             self.close_freezer()
 
     def update_bot_user(self, active_status, telegram_id):
+        """
+        hack:
+            turns out this fucker also calls the execute() method from the freezer,
+            hack it out
+        update_bot_user [summary]
+
+        Args:
+            active_status ([type]): [description]
+            telegram_id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         self.open_freezer()
-        # try:
-        #     PlatiniumBotUser.update(bot_user_active=active_status)
-        pass
+        try:
+            # user_2_update.bot_user_active = active_status
+            # user_2_update.save()
+            user_2_update = self.get_bot_user(telegram_id)
+            user_2_update.bot_user_active = active_status
+            user_2_update.save()
+            return user_2_update
+
+            # user_2_update = PlatiniumBotUser.update(
+                # bot_user_active=active_status
+            # ).where(user_telegram_id=telegram_id)
+            # user_2_update.execute()
+            # return user_2_update
+        except peewee.PeeweeException as pex:
+            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
+        except Exception as e:
+            logger.exception(f"Exception occurred -- {e}", exc_info=True)
 
     def get_bot_user(self, telegram_id):
         """
@@ -143,7 +170,7 @@ class Freezer():
         """
         self.open_freezer()
         try:
-            return PlatiniumBotUser.select(telegram_id)
+            return PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == telegram_id)
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
@@ -186,15 +213,6 @@ class PlatiniumBotUser(BaseFarm):
     class Meta():
         table_name = "table_PlatiniumBotUser"
 
-    def get_platinium_bot_user(self):
-        pass
-
-    def update_patinium_bot_user(self):
-        pass
-
-    def delete_platinium_bot_user(self):
-        pass
-
 
 class PlatiniumBotContent(BaseFarm):
     platinium_content_id = peewee.AutoField(primary_key=True, null=False)
@@ -214,15 +232,3 @@ class PlatiniumBotContent(BaseFarm):
 
     class Meta():
         table_name = "table_PlatiniumBotContent"
-
-    def add_platinium_bot_content(self):
-        pass
-
-    def get_platinium_bot_content(self):
-        pass
-
-    def update_patinium_bot_content(self):
-        pass
-
-    def delete_platinium_bot_content(self):
-        pass
