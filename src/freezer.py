@@ -48,6 +48,7 @@ class Freezer():
             host="localhost",
             port=3306
         )
+        self.db_open = False
 
     def open_freezer(self):
         """
@@ -57,6 +58,7 @@ class Freezer():
             [type]: [description]
         """
         if self.freezer.connect():
+            self.db_open = True
             print('\nconnected to db\n')
 
     def close_freezer(self):
@@ -67,6 +69,7 @@ class Freezer():
             [type]: [description]
         """
         if self.freezer.close():
+            self.db_open = False
             print('\nclosed cxn to db\n')
 
     def create_bot_tables(self):
@@ -74,7 +77,8 @@ class Freezer():
         create_bot_tables: checks for existence and if they don't exist, creates the database
                         tables that the bot uses.
         """
-        self.open_freezer()
+        if not self.db_open:
+            self.open_freezer()
         tbl_list = []
         if not self.freezer.table_exists("table_PlatiniumBotUser"):
             tbl_list.append(PlatiniumBotUser)
@@ -105,7 +109,8 @@ class Freezer():
             telegram_id ([type]): [description]
             telegram_name ([type]): [description]
         """
-        self.open_freezer()
+        if not self.db_open:
+            self.open_freezer()
         try:
             if phone is not None:
                 PlatiniumBotUser.create(
@@ -139,11 +144,14 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        self.open_freezer()
+        if not self.db_open:
+            self.open_freezer()
         try:
             # user_2_update.bot_user_active = active_status
             # user_2_update.save()
             user_2_update = self.get_bot_user(telegram_id)
+            if not self.db_open:
+                self.open_freezer()
             user_2_update.bot_user_active = active_status
             user_2_update.save()
             return user_2_update
@@ -168,7 +176,8 @@ class Freezer():
         Returns:
             PlatiniumBotUser: an instance of PlatiniumBotUser that contains the required data.
         """
-        self.open_freezer()
+        if not self.db_open:
+            self.open_freezer()
         try:
             return PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == telegram_id)
         except peewee.PeeweeException as pex:

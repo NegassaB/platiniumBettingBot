@@ -43,6 +43,7 @@ class FreezerTestSuites(unittest.TestCase):
             self.test_freezer_obj.open_freezer()
 
             mock_db.return_value.connect.assert_called()
+            self.assertTrue(self.test_freezer_obj.db_open)
 
     def test_close_freezer(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
@@ -126,6 +127,7 @@ class FreezerTestSuites(unittest.TestCase):
     def test_update_bot_user(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
+            # self.test_freezer_obj.freezer.execute.return_value = 'something'
             mock_db.execute.return_value = 'something'
             with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
                 mock_PBU_model.get.return_value = PlatiniumBotUser(
