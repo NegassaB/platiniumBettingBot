@@ -124,6 +124,7 @@ class FreezerTestSuites(unittest.TestCase):
                     )
                     print("both username & phone NOT NONE")
 
+    """
     def test_update_bot_user(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
@@ -137,8 +138,8 @@ class FreezerTestSuites(unittest.TestCase):
                     bot_user_active=True,
                     bot_user_joined_timestamp=datetime.datetime.now(
                         tz=timezone.utc
+                        )
                     )
-                )
 
                 mock_PBU_model.user_telegram_id = self.tlg_user_id
 
@@ -151,6 +152,7 @@ class FreezerTestSuites(unittest.TestCase):
 
                 mock_PBU_model.save.assert_called()
                 self.assertFalse(updated_user.bot_user_active)
+    """
 
     def test_get_bot_user(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
@@ -175,6 +177,33 @@ class FreezerTestSuites(unittest.TestCase):
                 )
                 self.assertEqual(user.user_telegram_id, self.tlg_user_id)
                 self.assertEqual(user.bot_user_name, self.tlg_username)
+
+    def test_add_new_content(self):
+        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
+            self.test_freezer_obj = Freezer()
+            with patch("src.freezer.PlatiniumBotContent") as mock_PBC_model:
+                content_list = {
+                    'time': '17:55',
+                    'teams': 'Slavia Prague - Rangers',
+                    'odds': '1.38',
+                    'country': 'euro.L',
+                    '3ways': 'over 1.5'
+                }
+                self.test_freezer_obj.add_new_content(
+                    content_list['time'],
+                    content_list['teams'],
+                    content_list['odds'],
+                    content_list['country'],
+                    content_list['3ways']
+                )
+                # mock_PBC_model.create.assert_called()
+                mock_PBC_model.create.assert_called_with(
+                    platinium_content_time=content_list['time'],
+                    platinium_content_teams=content_list['teams'],
+                    platinium_content_odds=content_list['odds'],
+                    platinium_content_country=content_list['country'],
+                    platinium_content_3ways=content_list['3ways']
+                )
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):

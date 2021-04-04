@@ -21,11 +21,11 @@ class Freezer():
         [x]. build create_table()
             condn is: if tables don't exist, create the necessary tables in create_table()
             if it does exist, skip
-        [ ]. build create_platinium_bot_user()
+        [x]. build add_new_bot_user()
         [ ]. build add_new_content()
             in this find a way to to get the actual message instead of the fk
         [ ]. build add_new_message()
-        [ ]. build a way to update platinium_content_posted_timestamp after posting
+        []. build a way to update platinium_content_posted_timestamp after posting
         [ ]. build the CRUD operation methods
 
     Freezer [summary]
@@ -97,13 +97,7 @@ class Freezer():
 
     def add_new_bot_user(self, telegram_id, telegram_name, phone=None):
         """
-        hack:
-            User.create(name="Kiran", age=19)
-            q = User.insert(name='Lata', age=20)
-            q.execute()
-            db.close()
-
-        create_new_bot_user [summary]
+        add_new_bot_user [summary]
 
         Args:
             telegram_id ([type]): [description]
@@ -132,9 +126,7 @@ class Freezer():
 
     def update_bot_user(self, active_status, telegram_id):
         """
-        hack:
-            turns out this fucker also calls the execute() method from the freezer,
-            hack it out
+        todo: untested!!!
         update_bot_user [summary]
 
         Args:
@@ -182,6 +174,34 @@ class Freezer():
         finally:
             self.close_freezer()
 
+    def add_new_content(self, content_time, content_teams, content_odds, content_country, content_3ways):
+        """
+        add_new_content [summary]
+
+        Args:
+            content_time ([type]): [description]
+            content_teams ([type]): [description]
+            content_odds ([type]): [description]
+            content_country ([type]): [description]
+            content_3ways ([type]): [description]
+        """
+        if not self.db_open:
+            self.open_freezer()
+        try:
+            PlatiniumBotContent.create(
+                platinium_content_time=content_time,
+                platinium_content_teams=content_teams,
+                platinium_content_odds=content_odds,
+                platinium_content_country=content_country,
+                platinium_content_3ways=content_3ways
+            )
+        except peewee.PeeweeException as pex:
+            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
+        except Exception as e:
+            logger.exception(f"Exception occurred -- {e}", exc_info=True)
+        finally:
+            self.close_freezer()
+
 
 class BaseFarm(peewee.Model):
     """
@@ -220,13 +240,13 @@ class PlatiniumBotUser(BaseFarm):
 
 class PlatiniumBotContent(BaseFarm):
     platinium_content_id = peewee.AutoField(primary_key=True, null=False)
-    platinium_content_time = peewee.CharField(20)
+    platinium_content_time = peewee.CharField(10)
     platinium_content_teams = peewee.TextField()
     platinium_content_odds = peewee.CharField(10)
-    platinium_content_country = peewee.CharField(25)
-    platinium_content_3ways = peewee.CharField(15)
+    platinium_content_country = peewee.CharField(30)
+    platinium_content_3ways = peewee.CharField(25)
     # todo update this when results b/me available after you scrape it
-    platinium_content_result = peewee.TextField()
+    platinium_content_result = peewee.TextField(default="")
 
     # todo update this when the content is posted
     platinium_content_posted_timestamp = peewee.DateTimeField(
