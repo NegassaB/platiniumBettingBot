@@ -28,7 +28,7 @@ class FreezerTestSuites(unittest.TestCase):
         self.tlg_first_name = "Negassa"
         # self.tlg_phone = None
         self.tlg_phone = "+251911985365"
-        self.active_status = False
+        self.tlg_active_status = False
 
     def tearDown(self):
         self.test_freezer_obj.close_freezer()
@@ -127,8 +127,7 @@ class FreezerTestSuites(unittest.TestCase):
     def test_update_bot_user(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
-            # self.test_freezer_obj.freezer.execute.return_value = 'something'
-            mock_db.execute.return_value = 'something'
+            print(self.test_freezer_obj.freezer.returning_clause)
             with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
                 mock_PBU_model.get.return_value = PlatiniumBotUser(
                     bot_user_id=1,
@@ -140,12 +139,13 @@ class FreezerTestSuites(unittest.TestCase):
                         tz=timezone.utc
                     )
                 )
+
                 mock_PBU_model.user_telegram_id = self.tlg_user_id
 
                 mock_PBU_model.save.return_value = 1
 
                 updated_user = self.test_freezer_obj.update_bot_user(
-                    active_status=self.active_status,
+                    active_status=self.tlg_active_status,
                     telegram_id=self.tlg_user_id
                 )
 

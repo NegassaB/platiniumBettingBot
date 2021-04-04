@@ -144,27 +144,22 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        if not self.db_open:
-            self.open_freezer()
+        # if not self.db_open:
+        #     self.open_freezer()
         try:
-            # user_2_update.bot_user_active = active_status
-            # user_2_update.save()
             user_2_update = self.get_bot_user(telegram_id)
             if not self.db_open:
                 self.open_freezer()
             user_2_update.bot_user_active = active_status
-            user_2_update.save()
+            user_2_update.save(force_insert=True)
             return user_2_update
-
-            # user_2_update = PlatiniumBotUser.update(
-                # bot_user_active=active_status
-            # ).where(user_telegram_id=telegram_id)
-            # user_2_update.execute()
-            # return user_2_update
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
             logger.exception(f"Exception occurred -- {e}", exc_info=True)
+        finally:
+            if self.db_open:
+                self.close_freezer()
 
     def get_bot_user(self, telegram_id):
         """
