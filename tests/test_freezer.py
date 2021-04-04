@@ -205,6 +205,28 @@ class FreezerTestSuites(unittest.TestCase):
                     platinium_content_3ways=content_list['3ways']
                 )
 
+    def test_get_bot_content(self):
+        """
+        todo:
+            test if it returns today's matches
+            test if it returns the matches in a list
+        test_get_bot_content [summary]
+        """
+        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
+            self.test_freezer_obj = Freezer()
+            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBC_model:
+                mock_PBC_model.get.return_value = PlatiniumBotContent(
+                    platinium_content_time='17:55',
+                    platinium_content_teams='Slavia Prague - Rangers',
+                    platinium_content_odds='1.38',
+                    platinium_content_country='euro.L',
+                    platinium_content_3ways='over 1.5',
+                    # platinium_content_result=peewee.TextField(default=""),
+                    platinium_content_posted_timestamp=datetime.datetime.today()
+                )
+                content = self.test_freezer_obj.get_bot_content()
+                mock_PBU_model.get.assert_called()
+
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
 

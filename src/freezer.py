@@ -202,6 +202,14 @@ class Freezer():
         finally:
             self.close_freezer()
 
+    def get_bot_content(self):
+        """
+        todo:
+            make it return a list of today's matches
+        get_bot_content [summary]
+        """
+        pass
+
 
 class BaseFarm(peewee.Model):
     """
