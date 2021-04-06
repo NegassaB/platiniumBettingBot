@@ -205,17 +205,17 @@ class FreezerTestSuites(unittest.TestCase):
                     platinium_content_3ways=content_list['3ways']
                 )
 
-    def test_get_bot_content(self):
+    def test_get_today_bot_content(self):
         """
         todo:
             test if it returns today's matches
-            test if it returns the matches in a list
+            test if it returns the matches in a list of dicts
         test_get_bot_content [summary]
         """
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
             with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBC_model:
-                mock_PBC_model.get.return_value = PlatiniumBotContent(
+                mock_PBC_model.select.return_value = PlatiniumBotContent(
                     platinium_content_time='17:55',
                     platinium_content_teams='Slavia Prague - Rangers',
                     platinium_content_odds='1.38',
@@ -224,8 +224,19 @@ class FreezerTestSuites(unittest.TestCase):
                     # platinium_content_result=peewee.TextField(default=""),
                     platinium_content_posted_timestamp=datetime.datetime.today()
                 )
-                content = self.test_freezer_obj.get_bot_content()
-                mock_PBU_model.get.assert_called()
+                content = self.test_freezer_obj.get_today_bot_content()
+
+                self.assertIsInstance(content, peewee.ModelSelect)
+                self.assertIsInstance(content.platinium_content_time, str)
+
+                mock_PBC_model.select.assert_called()
+                mock_PBC_model.where.assert_called()
+
+                # self.assertIsInstance(content, list)
+                # self.assertGreater(len(content), 0)
+                # content_dict = content.pop(0)
+                # self.assertIsInstance(content_dict, dict)
+                # self.assertIn("teams", content_dict)
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):

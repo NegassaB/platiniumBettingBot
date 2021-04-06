@@ -202,13 +202,30 @@ class Freezer():
         finally:
             self.close_freezer()
 
-    def get_bot_content(self):
+    def get_today_bot_content(self):
         """
         todo:
-            make it return a list of today's matches
+            make it return a list of dicts today's matches
         get_bot_content [summary]
         """
-        pass
+        if not self.db_open:
+            self.open_freezer()
+        try:
+            # self.list_of_content = []
+            # self.list_of_content.append(
+            #     PlatiniumBotContent.select().where(
+            #         PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today()
+            #         )
+            #     ).dicts()
+            return PlatiniumBotContent.select().where(
+                PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today().date()
+            )
+        except peewee.PeeweeException as pex:
+            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
+        except Exception as e:
+            logger.exception(f"Exception occurred -- {e}", exc_info=True)
+        finally:
+            self.close_freezer()
 
 
 class BaseFarm(peewee.Model):
