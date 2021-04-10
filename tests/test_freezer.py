@@ -214,29 +214,49 @@ class FreezerTestSuites(unittest.TestCase):
         """
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
             self.test_freezer_obj = Freezer()
-            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBC_model:
-                mock_PBC_model.select.return_value = PlatiniumBotContent(
-                    platinium_content_time='17:55',
-                    platinium_content_teams='Slavia Prague - Rangers',
-                    platinium_content_odds='1.38',
-                    platinium_content_country='euro.L',
-                    platinium_content_3ways='over 1.5',
-                    # platinium_content_result=peewee.TextField(default=""),
-                    platinium_content_posted_timestamp=datetime.datetime.today()
+            with patch("src.freezer.PlatiniumBotContent", autospec=True) as mock_PBC_model:
+                mock_PBC_model.select().where().return_value = list(
+                    peewee.ModelSelect(
+                        model=PlatiniumBotContent,
+                        fields_or_models=[
+                            PlatiniumBotContent(
+                                platinium_content_time='17:55',
+                                platinium_content_teams='Slavia Prague - Rangers',
+                                platinium_content_odds='1.38',
+                                platinium_content_country='euro.L',
+                                platinium_content_3ways='over 1.5',
+                                platinium_content_posted_timestamp=datetime.datetime.today()
+                            ),
+                            PlatiniumBotContent(
+                                platinium_content_time='17:55',
+                                platinium_content_teams='Slavia Prague - Rangers',
+                                platinium_content_odds='1.38',
+                                platinium_content_country='euro.L',
+                                platinium_content_3ways='over 1.5',
+                                platinium_content_posted_timestamp=datetime.datetime.today()
+                            ),
+                            PlatiniumBotContent(
+                                platinium_content_time='17:55',
+                                platinium_content_teams='Slavia Prague - Rangers',
+                                platinium_content_odds='1.38',
+                                platinium_content_country='euro.L',
+                                platinium_content_3ways='over 1.5',
+                                platinium_content_posted_timestamp=datetime.datetime.today()
+                            )
+                        ]
+                    ).dicts()
                 )
                 content = self.test_freezer_obj.get_today_bot_content()
 
-                self.assertIsInstance(content, peewee.ModelSelect)
-                self.assertIsInstance(content.platinium_content_time, str)
+                self.assertIsInstance(content, list)
+                self.assertGreater(len(content), 0)
+                val1 = content.pop(0)
+                self.assertIsInstance(val1, dict)
+                self.assertIn("platinium_content_time", val1.keys())
+                self.assertIn("17:55", val1.values())
 
                 mock_PBC_model.select.assert_called()
                 mock_PBC_model.where.assert_called()
-
-                # self.assertIsInstance(content, list)
-                # self.assertGreater(len(content), 0)
-                # content_dict = content.pop(0)
-                # self.assertIsInstance(content_dict, dict)
-                # self.assertIn("teams", content_dict)
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):

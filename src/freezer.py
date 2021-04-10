@@ -49,6 +49,7 @@ class Freezer():
             port=3306
         )
         self.db_open = False
+        print(f"Freezer obj is -- {self.freezer.__dict__} \n\n")
 
     def open_freezer(self):
         """
@@ -211,15 +212,13 @@ class Freezer():
         if not self.db_open:
             self.open_freezer()
         try:
-            # self.list_of_content = []
-            # self.list_of_content.append(
-            #     PlatiniumBotContent.select().where(
-            #         PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today()
-            #         )
-            #     ).dicts()
-            return PlatiniumBotContent.select().where(
-                PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today().date()
+            return list(PlatiniumBotContent.select().where(
+                PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today()
+            ).dicts()
             )
+            # return PlatiniumBotContent.select().where(
+            #     PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today().date()
+            # )
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
