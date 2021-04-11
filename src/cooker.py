@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 
 class Cooker():
     """
-    todo:
-        1.
-
     doc:
     Cooker [summary]
 

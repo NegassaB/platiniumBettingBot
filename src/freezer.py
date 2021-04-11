@@ -20,10 +20,6 @@ database_proxy = peewee.DatabaseProxy()
 class Freezer():
     """
     todo:
-        [x]. build create_table()
-            condn is: if tables don't exist, create the necessary tables in create_table()
-            if it does exist, skip
-        [x]. build add_new_bot_user()
         [ ]. build add_new_content()
             in this find a way to to get the actual message instead of the fk
         [ ]. build add_new_message()
@@ -85,9 +81,6 @@ class Freezer():
         else:
             print('\n dont know what to put in the else block of close_freezer()\n')
 
-    def get_freezer_instance(self):
-        return self.freezer
-
     def create_bot_tables(self):
         """
         create_bot_tables: checks for existence and if they don't exist, creates the database
@@ -144,7 +137,7 @@ class Freezer():
 
     def update_bot_user(self, active_status, telegram_id):
         """
-        todo: untested!!!
+        todo: build the update_bot_user code & test it
         update_bot_user [summary]
 
         Args:
@@ -154,22 +147,7 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        # if not self.db_open:
-        #     self.open_freezer()
-        try:
-            user_2_update = self.get_bot_user(telegram_id)
-            if not self.db_open:
-                self.open_freezer()
-            user_2_update.bot_user_active = active_status
-            user_2_update.save(force_insert=True)
-            return user_2_update
-        except peewee.PeeweeException as pex:
-            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
-        except Exception as e:
-            logger.exception(f"Exception occurred -- {e}", exc_info=True)
-        finally:
-            if self.db_open:
-                self.close_freezer()
+       pass
 
     def get_bot_user(self, telegram_id):
         """
@@ -247,11 +225,6 @@ class Freezer():
 
 class BaseFarm(peewee.Model):
     """
-    todo:
-        [ ] - override update() PlatiniumMessage to update platinium_content_result when data b/mes available
-    hack[ ] - for the above perhaps might be to override something in the PlatiniumBotContent to return the full
-                content instead of the id number
-        [ ] - give every model it's own method to call the save, update, etc methods.
     BaseModel [summary]
 
     Args:
