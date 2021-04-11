@@ -58,36 +58,6 @@ class FreezerTestSuites(unittest.TestCase):
         val = PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == self.tlg_user_id)
         self.assertEqual(val.user_telegram_id, self.tlg_user_id)
 
-    """
-    def test_update_bot_user(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            print(self.test_freezer_obj.freezer.returning_clause)
-            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
-                mock_PBU_model.get.return_value = PlatiniumBotUser(
-                    bot_user_id=1,
-                    user_telegram_id=self.tlg_user_id,
-                    bot_user_name=self.tlg_username,
-                    bot_user_phone=self.tlg_phone,
-                    bot_user_active=True,
-                    bot_user_joined_timestamp=datetime.datetime.now(
-                        tz=timezone.utc
-                        )
-                    )
-
-                mock_PBU_model.user_telegram_id = self.tlg_user_id
-
-                mock_PBU_model.save.return_value = 1
-
-                updated_user = self.test_freezer_obj.update_bot_user(
-                    active_status=self.tlg_active_status,
-                    telegram_id=self.tlg_user_id
-                )
-
-                mock_PBU_model.save.assert_called()
-                self.assertFalse(updated_user.bot_user_active)
-    """
-
     def test_get_bot_user(self):
         add_user_for_testing(
             freezer_obj=self.test_freezer_obj,
@@ -100,6 +70,23 @@ class FreezerTestSuites(unittest.TestCase):
         if user is not None:
             self.assertEqual(user.user_telegram_id, self.tlg_user_id)
             self.assertEqual(user.bot_user_name, self.tlg_username)
+
+    def test_update_bot_user(self):
+        add_user_for_testing(
+            freezer_obj=self.test_freezer_obj,
+            tg_user_id=self.tlg_user_id,
+            tg_phone=self.tlg_phone,
+            tg_username=self.tlg_username,
+            tg_first_name=self.tlg_first_name
+        )
+
+        self.test_freezer_obj.update_bot_user(
+            active_status=self.tlg_active_status,
+            telegram_id=self.tlg_user_id
+        )
+
+        user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+        self.assertFalse(user.bot_user_active)
 
     def test_add_new_content(self):
         with patch("peewee.MySQLDatabase", autospec=True) as mock_db:

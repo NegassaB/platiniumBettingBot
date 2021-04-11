@@ -137,7 +137,6 @@ class Freezer():
 
     def update_bot_user(self, active_status, telegram_id):
         """
-        todo: build the update_bot_user code & test it
         update_bot_user [summary]
 
         Args:
@@ -147,7 +146,11 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-       pass
+        user_2_update = self.get_bot_user(telegram_id)
+        if self.freezer.is_closed():
+            self.open_freezer()
+        user_2_update.bot_user_active = active_status
+        user_2_update.save()
 
     def get_bot_user(self, telegram_id):
         """
