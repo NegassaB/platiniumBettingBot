@@ -14,6 +14,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+database_proxy = peewee.DatabaseProxy()
+
 
 class Freezer():
     """
@@ -37,19 +39,24 @@ class Freezer():
     db_username = "platinium_bot"
     db_pswd = "platinium_pswd"
 
-    def __init__(self):
+    def __init__(self, testing=False):
         """
         __init__ [summary]
         """
-        self.freezer = peewee.MySQLDatabase(
-            database=Freezer.db_name,
-            user=Freezer.db_username,
-            password=Freezer.db_pswd,
-            host="localhost",
-            port=3306
-        )
-        self.db_open = False
-        print(f"Freezer obj is -- {self.freezer.__dict__} \n\n")
+        if testing:
+            self.freezer = peewee.SqliteDatabase(":memory:", autoconnect=False)
+            self.testing = True
+        else:
+            self.freezer = peewee.MySQLDatabase(
+                database=Freezer.db_name,
+                user=Freezer.db_username,
+                password=Freezer.db_pswd,
+                host="localhost",
+                port=3306,
+                autoconnect=False
+            )
+            self.testing = False
+        database_proxy.initialize(self.freezer)
 
     def open_freezer(self):
         """
@@ -58,8 +65,8 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        if self.freezer.connect():
-            self.db_open = True
+        if self.freezer.is_closed():
+            self.freezer.connect(reuse_if_open=True)
             print('\nconnected to db\n')
 
     def close_freezer(self):
@@ -69,16 +76,24 @@ class Freezer():
         Returns:
             [type]: [description]
         """
-        if self.freezer.close():
-            self.db_open = False
+        if self.testing and not self.freezer.is_closed():
+            print("\n not closing cxn to db cause you're testing :)\n")
+            pass
+        elif not self.freezer.is_closed():
+            self.freezer.close()
             print('\nclosed cxn to db\n')
+        else:
+            print('\n dont know what to put in the else block of close_freezer()\n')
+
+    def get_freezer_instance(self):
+        return self.freezer
 
     def create_bot_tables(self):
         """
         create_bot_tables: checks for existence and if they don't exist, creates the database
                         tables that the bot uses.
         """
-        if not self.db_open:
+        if self.freezer.is_closed():
             self.open_freezer()
         tbl_list = []
         if not self.freezer.table_exists("table_PlatiniumBotUser"):
@@ -88,11 +103,13 @@ class Freezer():
 
         if (tbl_list) != 0:
             try:
-                self.freezer.create_tables(tbl_list)
+                self.freezer.create_tables(models=tbl_list)
             except peewee.PeeweeException as pex:
                 logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
+                raise pex
             except Exception as e:
                 logger.exception(f"exception occurred -- {e}", exc_info=True)
+                raise e
             finally:
                 self.close_freezer()
 
@@ -104,7 +121,7 @@ class Freezer():
             telegram_id ([type]): [description]
             telegram_name ([type]): [description]
         """
-        if not self.db_open:
+        if self.freezer.is_closed():
             self.open_freezer()
         try:
             if phone is not None:
@@ -164,10 +181,11 @@ class Freezer():
         Returns:
             PlatiniumBotUser: an instance of PlatiniumBotUser that contains the required data.
         """
-        if not self.db_open:
+        if self.freezer.is_closed():
             self.open_freezer()
         try:
-            return PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == telegram_id)
+            result = PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == telegram_id)
+            return result
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
@@ -240,7 +258,7 @@ class BaseFarm(peewee.Model):
         peewee.Model ([type]): [description]
     """
     class Meta():
-        database = Freezer()
+        database = database_proxy
 
 
 class PlatiniumBotUser(BaseFarm):
