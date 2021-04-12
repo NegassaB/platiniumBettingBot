@@ -49,37 +49,19 @@ class FreezerTestSuites(unittest.TestCase):
             self.assertTrue(self.test_freezer_obj.freezer.table_exists("table_PlatiniumBotContent"))
 
     def test_add_new_bot_user(self):
-        add_user_for_testing(
-            freezer_obj=self.test_freezer_obj,
-            tg_user_id=self.tlg_user_id,
-            tg_phone=self.tlg_phone,
-            tg_username=self.tlg_username,
-            tg_first_name=self.tlg_first_name
-        )
+        add_user_for_testing(self.test_freezer_obj)
         val = PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == self.tlg_user_id)
         self.assertEqual(val.user_telegram_id, self.tlg_user_id)
 
     def test_get_bot_user(self):
-        add_user_for_testing(
-            freezer_obj=self.test_freezer_obj,
-            tg_user_id=self.tlg_user_id,
-            tg_phone=self.tlg_phone,
-            tg_username=self.tlg_username,
-            tg_first_name=self.tlg_first_name
-        )
+        add_user_for_testing(self.test_freezer_obj)
         user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
         if user is not None:
             self.assertEqual(user.user_telegram_id, self.tlg_user_id)
             self.assertEqual(user.bot_user_name, self.tlg_username)
 
     def test_update_bot_user(self):
-        add_user_for_testing(
-            freezer_obj=self.test_freezer_obj,
-            tg_user_id=self.tlg_user_id,
-            tg_phone=self.tlg_phone,
-            tg_username=self.tlg_username,
-            tg_first_name=self.tlg_first_name
-        )
+        add_user_for_testing(self.test_freezer_obj)
 
         self.test_freezer_obj.update_bot_user(
             active_status=self.tlg_active_status,
@@ -117,7 +99,15 @@ class FreezerTestSuites(unittest.TestCase):
         pass
 
 
-def add_user_for_testing(freezer_obj, tg_user_id, tg_phone, tg_username, tg_first_name):
+def add_user_for_testing(freezer_obj):
+    tg_user_id = 355355326
+    # tg_username = None
+    tg_username = "Gadd"
+    tg_first_name = "Negassa"
+    # tg_phone = None
+    tg_phone = "+251911985365"
+    tlg_active_status = False
+
     if tg_username is None and tg_phone is None:
         freezer_obj.add_new_bot_user(
             tg_user_id,

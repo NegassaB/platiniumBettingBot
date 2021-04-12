@@ -221,6 +221,9 @@ class Freezer():
         finally:
             self.close_freezer()
 
+    def update_bot_content(self):
+        pass
+
 
 class BaseFarm(peewee.Model):
     """
