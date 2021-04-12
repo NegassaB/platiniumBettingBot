@@ -171,6 +171,3 @@ class PlatiniumBotUserModelTestSuites(unittest.TestCase):
         self.assertIsInstance(self.platinium_bot_user, peewee.Model)
         self.assertIsInstance(self.platinium_bot_content, BaseFarm)
         self.assertIsInstance(self.platinium_bot_content, peewee.Model)
-
-    def test_telegramuser_tables_data(self):
-        pass
