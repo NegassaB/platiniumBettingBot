@@ -1,5 +1,6 @@
 import unittest
 import datetime
+import dateutil.parser
 from datetime import timezone
 from unittest.mock import (MagicMock, patch)
 
@@ -97,9 +98,6 @@ class FreezerTestSuites(unittest.TestCase):
 
     def test_get_bot_content_today(self):
         """
-        todo:
-            test if it returns today's matches
-            test if it returns the matches in a list of dicts
         test_get_bot_content [summary]
         """
         add_content_for_testing(self.test_freezer_obj)
@@ -110,6 +108,13 @@ class FreezerTestSuites(unittest.TestCase):
         self.assertIsInstance(val1, dict)
         self.assertIn("platinium_content_time", val1.keys())
         self.assertIn("over 1.5", val1.values())
+        val_posted_date = dateutil.parser.parse(
+            val1["platinium_content_posted_timestamp"]
+        )
+        self.assertEqual(val_posted_date.date(), datetime.datetime.today().date())
+
+    def test_update_bot_content(self):
+        pass
 
 
 def add_user_for_testing(freezer_obj, tg_user_id, tg_phone, tg_username, tg_first_name):
