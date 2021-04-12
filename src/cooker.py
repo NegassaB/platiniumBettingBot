@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 
 class Cooker():
     """
-    todo:
-        1.
-
     doc:
     Cooker [summary]
 
@@ -25,7 +22,7 @@ class Cooker():
     """
     def __init__(self, source_url):
         """
-        docs:
+        doc:
         The Cooker class that will be responsible for getting the content from
         the website.
 
