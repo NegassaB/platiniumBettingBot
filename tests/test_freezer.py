@@ -1,5 +1,6 @@
 import unittest
 import datetime
+import dateutil.parser
 from datetime import timezone
 from unittest.mock import (MagicMock, patch)
 
@@ -10,17 +11,17 @@ from src.freezer import (
     PlatiniumBotUser,
     PlatiniumBotContent
 )
+# from tests.do_something import add_user_for_testing
 
 
 class FreezerTestSuites(unittest.TestCase):
     """
-    todo:
-
     FreezerTestSuites: tests the Freezer class.
 
     Args:
         unittest (TestCase): A class whose instances are single test cases that are inherited.
     """
+
     def setUp(self):
         self.tlg_user_id = 355355326
         # self.tlg_username = None
@@ -29,234 +30,134 @@ class FreezerTestSuites(unittest.TestCase):
         # self.tlg_phone = None
         self.tlg_phone = "+251911985365"
         self.tlg_active_status = False
+        self.test_freezer_obj = Freezer(True)
+        self.test_freezer_obj.open_freezer()
+        self.test_freezer_obj.create_bot_tables()
 
     def tearDown(self):
+        self.test_freezer_obj.testing = False
         self.test_freezer_obj.close_freezer()
         self.test_freezer_obj = None
 
-    def test_open_freezer(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-
-            mock_db.assert_called()
-
-            self.test_freezer_obj.open_freezer()
-
-            mock_db.return_value.connect.assert_called()
-            self.assertTrue(self.test_freezer_obj.db_open)
-
-    def test_close_freezer(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            mock_db.side_effect = peewee.PeeweeException
-            self.test_freezer_obj.open_freezer()
-            self.test_freezer_obj.close_freezer()
-
-            mock_db.return_value.close.assert_called()
-
     def test_create_bot_tables(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            mock_db.side_effect = peewee.PeeweeException
-            self.test_freezer_obj.freezer.table_exists.return_value = False
+        try:
             self.test_freezer_obj.create_bot_tables()
+        except Exception as e:
+            print(f"test failed due to exception {e}")
+        else:
+            self.assertTrue(self.test_freezer_obj.freezer.table_exists("table_PlatiniumBotUser"))
+            self.assertTrue(self.test_freezer_obj.freezer.table_exists("table_PlatiniumBotContent"))
 
-            mock_db.return_value.table_exists.assert_called_with(
-                "table_PlatiniumBotContent"
-            )
-            mock_db.return_value.create_tables.assert_called()
-            # turns out the return_value from mock_db is actually test_freezer.obj.freezer itself
-            # self.test_freezer_obj.freezer.create_tables.assert_called()
-            mock_db.return_value.create_tables.assert_called_with(
-                [PlatiniumBotUser, PlatiniumBotContent]
-            )
-
-    def test_create_new_bot_user(self):
-        with patch("src.freezer.peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
-                if self.tlg_username is None and self.tlg_phone is None:
-                    self.test_freezer_obj.add_new_bot_user(
-                        self.tlg_user_id,
-                        self.tlg_first_name
-                    )
-
-                    mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=self.tlg_user_id,
-                        bot_user_name=self.tlg_first_name
-                    )
-                    print("both username & phone ARE NONE")
-                elif self.tlg_username is None and self.tlg_phone is not None:
-                    self.test_freezer_obj.create_new_bot_user(
-                        telegram_id=self.tlg_user_id,
-                        telegram_name=self.tlg_first_name,
-                        phone=self.tlg_phone
-                    )
-
-                    mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=self.tlg_user_id,
-                        bot_user_name=self.tlg_first_name,
-                        bot_user_phone=self.tlg_phone
-                    )
-                    print("phone NOT NONE")
-                elif self.tlg_phone is None and self.tlg_username is not None:
-                    self.test_freezer_obj.create_new_bot_user(
-                        telegram_id=self.tlg_user_id,
-                        telegram_name=self.tlg_username
-                    )
-
-                    mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=self.tlg_user_id,
-                        bot_user_name=self.tlg_username
-                    )
-                    print("username NOT NONE")
-                else:
-                    self.test_freezer_obj.add_new_bot_user(
-                        telegram_id=self.tlg_user_id,
-                        telegram_name=self.tlg_username,
-                        phone=self.tlg_phone
-                    )
-
-                    mock_PBU_model.create.assert_called_with(
-                        user_telegram_id=self.tlg_user_id,
-                        bot_user_name=self.tlg_username,
-                        bot_user_phone=self.tlg_phone
-                    )
-                    print("both username & phone NOT NONE")
-
-    """
-    def test_update_bot_user(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            print(self.test_freezer_obj.freezer.returning_clause)
-            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
-                mock_PBU_model.get.return_value = PlatiniumBotUser(
-                    bot_user_id=1,
-                    user_telegram_id=self.tlg_user_id,
-                    bot_user_name=self.tlg_username,
-                    bot_user_phone=self.tlg_phone,
-                    bot_user_active=True,
-                    bot_user_joined_timestamp=datetime.datetime.now(
-                        tz=timezone.utc
-                        )
-                    )
-
-                mock_PBU_model.user_telegram_id = self.tlg_user_id
-
-                mock_PBU_model.save.return_value = 1
-
-                updated_user = self.test_freezer_obj.update_bot_user(
-                    active_status=self.tlg_active_status,
-                    telegram_id=self.tlg_user_id
-                )
-
-                mock_PBU_model.save.assert_called()
-                self.assertFalse(updated_user.bot_user_active)
-    """
+    def test_add_new_bot_user(self):
+        add_user_for_testing(self.test_freezer_obj)
+        val = PlatiniumBotUser.get(PlatiniumBotUser.user_telegram_id == self.tlg_user_id)
+        self.assertEqual(val.user_telegram_id, self.tlg_user_id)
 
     def test_get_bot_user(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            with patch("src.freezer.PlatiniumBotUser", autospec=True) as mock_PBU_model:
-                mock_PBU_model.get.return_value = PlatiniumBotUser(
-                    bot_user_id=1,
-                    user_telegram_id=self.tlg_user_id,
-                    bot_user_name=self.tlg_username,
-                    bot_user_phone=self.tlg_phone,
-                    bot_user_active=True,
-                    bot_user_joined_timestamp=datetime.datetime.now(
-                        tz=timezone.utc
-                    )
-                )
-                mock_PBU_model.user_telegram_id = self.tlg_user_id
+        add_user_for_testing(self.test_freezer_obj)
+        user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+        if user is not None:
+            self.assertEqual(user.user_telegram_id, self.tlg_user_id)
+            self.assertEqual(user.bot_user_name, self.tlg_username)
 
-                user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+    def test_update_bot_user(self):
+        add_user_for_testing(self.test_freezer_obj)
 
-                mock_PBU_model.get.assert_called_with(
-                    mock_PBU_model.user_telegram_id == self.tlg_user_id
-                )
-                self.assertEqual(user.user_telegram_id, self.tlg_user_id)
-                self.assertEqual(user.bot_user_name, self.tlg_username)
+        self.test_freezer_obj.update_bot_user(
+            active_status=self.tlg_active_status,
+            telegram_id=self.tlg_user_id
+        )
+
+        user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+        self.assertFalse(user.bot_user_active)
 
     def test_add_new_content(self):
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            with patch("src.freezer.PlatiniumBotContent") as mock_PBC_model:
-                content_list = {
-                    'time': '17:55',
-                    'teams': 'Slavia Prague - Rangers',
-                    'odds': '1.38',
-                    'country': 'euro.L',
-                    '3ways': 'over 1.5'
-                }
-                self.test_freezer_obj.add_new_content(
-                    content_list['time'],
-                    content_list['teams'],
-                    content_list['odds'],
-                    content_list['country'],
-                    content_list['3ways']
-                )
-                # mock_PBC_model.create.assert_called()
-                mock_PBC_model.create.assert_called_with(
-                    platinium_content_time=content_list['time'],
-                    platinium_content_teams=content_list['teams'],
-                    platinium_content_odds=content_list['odds'],
-                    platinium_content_country=content_list['country'],
-                    platinium_content_3ways=content_list['3ways']
-                )
+        add_content_for_testing(self.test_freezer_obj)
+        val = PlatiniumBotContent.get(
+            PlatiniumBotContent.platinium_content_teams == 'Slavia Prague - Rangers'
+        )
+        self.assertEqual(val.platinium_content_country, 'euro.L')
 
-    def test_get_today_bot_content(self):
+    def test_get_bot_content_today(self):
         """
-        todo:
-            test if it returns today's matches
-            test if it returns the matches in a list of dicts
         test_get_bot_content [summary]
         """
-        with patch("peewee.MySQLDatabase", autospec=True) as mock_db:
-            self.test_freezer_obj = Freezer()
-            with patch("src.freezer.PlatiniumBotContent", autospec=True) as mock_PBC_model:
-                mock_PBC_model.select().where().return_value = list(
-                    peewee.ModelSelect(
-                        model=PlatiniumBotContent,
-                        fields_or_models=[
-                            PlatiniumBotContent(
-                                platinium_content_time='17:55',
-                                platinium_content_teams='Slavia Prague - Rangers',
-                                platinium_content_odds='1.38',
-                                platinium_content_country='euro.L',
-                                platinium_content_3ways='over 1.5',
-                                platinium_content_posted_timestamp=datetime.datetime.today()
-                            ),
-                            PlatiniumBotContent(
-                                platinium_content_time='17:55',
-                                platinium_content_teams='Slavia Prague - Rangers',
-                                platinium_content_odds='1.38',
-                                platinium_content_country='euro.L',
-                                platinium_content_3ways='over 1.5',
-                                platinium_content_posted_timestamp=datetime.datetime.today()
-                            ),
-                            PlatiniumBotContent(
-                                platinium_content_time='17:55',
-                                platinium_content_teams='Slavia Prague - Rangers',
-                                platinium_content_odds='1.38',
-                                platinium_content_country='euro.L',
-                                platinium_content_3ways='over 1.5',
-                                platinium_content_posted_timestamp=datetime.datetime.today()
-                            )
-                        ]
-                    ).dicts()
-                )
-                content = self.test_freezer_obj.get_today_bot_content()
+        add_content_for_testing(self.test_freezer_obj)
+        content = self.test_freezer_obj.get_bot_content_today()
+        self.assertIsInstance(content, list)
+        self.assertGreater(len(content), 0)
+        val1 = content.pop(0)
+        self.assertIsInstance(val1, dict)
+        self.assertIn("platinium_content_time", val1.keys())
+        self.assertIn("over 1.5", val1.values())
+        val_posted_date = dateutil.parser.parse(
+            val1["platinium_content_posted_timestamp"]
+        )
+        self.assertEqual(val_posted_date.date(), datetime.datetime.today().date())
 
-                self.assertIsInstance(content, list)
-                self.assertGreater(len(content), 0)
-                val1 = content.pop(0)
-                self.assertIsInstance(val1, dict)
-                self.assertIn("platinium_content_time", val1.keys())
-                self.assertIn("17:55", val1.values())
+    def test_update_bot_content(self):
+        pass
 
-                mock_PBC_model.select.assert_called()
-                mock_PBC_model.where.assert_called()
+
+def add_user_for_testing(freezer_obj):
+    tg_user_id = 355355326
+    # tg_username = None
+    tg_username = "Gadd"
+    tg_first_name = "Negassa"
+    # tg_phone = None
+    tg_phone = "+251911985365"
+    tlg_active_status = False
+
+    if tg_username is None and tg_phone is None:
+        freezer_obj.add_new_bot_user(
+            tg_user_id,
+            tg_first_name
+        )
+
+        print("both username & phone ARE NONE")
+    elif tg_username is None and tg_phone is not None:
+        freezer_obj.create_new_bot_user(
+            telegram_id=tg_user_id,
+            telegram_name=tg_first_name,
+            phone=tg_phone
+        )
+
+        print("phone NOT NONE")
+    elif tg_phone is None and tg_username is not None:
+        freezer_obj.create_new_bot_user(
+            telegram_id=tg_user_id,
+            telegram_name=tg_username
+        )
+
+        print("username NOT NONE")
+    else:
+        freezer_obj.add_new_bot_user(
+            telegram_id=tg_user_id,
+            telegram_name=tg_username,
+            phone=tg_phone
+        )
+
+        print("both username & phone NOT NONE")
+
+
+def add_content_for_testing(freezer_obj):
+    content_list = {
+        'time': '17:55',
+        'teams': 'Slavia Prague - Rangers',
+        'odds': '1.38',
+        'country': 'euro.L',
+        '3ways': 'over 1.5'
+    }
+    x = 5
+    while x != 0:
+        x -= 1
+        freezer_obj.add_new_content(
+            content_list['time'],
+            content_list['teams'],
+            content_list['odds'],
+            content_list['country'],
+            content_list['3ways']
+        )
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
