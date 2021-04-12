@@ -94,7 +94,7 @@ class Freezer():
         if not self.freezer.table_exists("table_PlatiniumBotContent"):
             tbl_list.append(PlatiniumBotContent)
 
-        if (tbl_list) != 0:
+        if len(tbl_list) != 0:
             try:
                 self.freezer.create_tables(models=tbl_list)
             except peewee.PeeweeException as pex:
@@ -135,23 +135,6 @@ class Freezer():
         finally:
             self.close_freezer()
 
-    def update_bot_user(self, active_status, telegram_id):
-        """
-        update_bot_user [summary]
-
-        Args:
-            active_status ([type]): [description]
-            telegram_id ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        user_2_update = self.get_bot_user(telegram_id)
-        if self.freezer.is_closed():
-            self.open_freezer()
-        user_2_update.bot_user_active = active_status
-        user_2_update.save()
-
     def get_bot_user(self, telegram_id):
         """
         get_bot_user [summary]
@@ -174,6 +157,23 @@ class Freezer():
         finally:
             self.close_freezer()
 
+    def update_bot_user(self, active_status, telegram_id):
+        """
+        update_bot_user [summary]
+
+        Args:
+            active_status ([type]): [description]
+            telegram_id ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
+        user_2_update = self.get_bot_user(telegram_id)
+        if self.freezer.is_closed():
+            self.open_freezer()
+        user_2_update.bot_user_active = active_status
+        user_2_update.save()
+
     def add_new_content(self, content_time, content_teams, content_odds, content_country, content_3ways):
         """
         add_new_content [summary]
@@ -185,7 +185,7 @@ class Freezer():
             content_country ([type]): [description]
             content_3ways ([type]): [description]
         """
-        if not self.db_open:
+        if self.freezer.is_closed():
             self.open_freezer()
         try:
             PlatiniumBotContent.create(
@@ -202,22 +202,18 @@ class Freezer():
         finally:
             self.close_freezer()
 
-    def get_today_bot_content(self):
+    def get_bot_content_today(self):
         """
-        todo:
-            make it return a list of dicts today's matches
         get_bot_content [summary]
         """
-        if not self.db_open:
+        if self.freezer.is_closed():
             self.open_freezer()
         try:
-            return list(PlatiniumBotContent.select().where(
-                PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today()
-            ).dicts()
+            return list(
+                PlatiniumBotContent.select().where(
+                    PlatiniumBotContent.platinium_content_posted_timestamp >= datetime.today().date()
+                ).dicts()
             )
-            # return PlatiniumBotContent.select().where(
-            #     PlatiniumBotContent.platinium_content_posted_timestamp == datetime.today().date()
-            # )
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
