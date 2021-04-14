@@ -14,9 +14,6 @@ logger = logging.getLogger(__name__)
 
 class Cooker():
     """
-    todo:
-        1.
-
     doc:
     Cooker [summary]
 
@@ -25,7 +22,7 @@ class Cooker():
     """
     def __init__(self, source_url):
         """
-        docs:
+        doc:
         The Cooker class that will be responsible for getting the content from
         the website.
 
@@ -79,12 +76,63 @@ class Cooker():
         Returns:
             [type]: [description]
         """
-        """
-        """
         def pick_out(row):
             """
             This methods is used to pick out texts from the row. These include
-            the tiem, teams and odds.
+            the time, teams and odds.
+
+            Args:
+                row (NavigableString): The row that contains the texts
+                that are required.
+
+            Returns:
+                list: a list_of_vals populated with the values in each row.
+            """
+            for pickings in row.find_all('td'):
+                val = pickings.text.strip()
+                if len(val) != 0:
+                    list_of_vals.append(pickings.text.strip())
+
+        self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
+        self.meaty_list = []
+        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
+        list_of_vals = []
+        table = self.soup.find("table")
+        all_rows = table.find_all('tr')
+        _, _ = all_rows.pop(0), all_rows.pop(-1)
+        while len(all_rows) != 0:
+            row1, row2 = all_rows.pop(0), all_rows.pop(0)
+            pick_out(row1)
+            pick_out(row2)
+            self.meaty_list.append(dict(zip(list_of_keys, list_of_vals)))
+            list_of_vals.clear()
+
+    def add_results_as_spice(self):
+        """
+        todo:
+            [ ]. get the results from the history site
+            [ ]. parse the results out of the html page
+            [ ]. find the match it belongs to by using one of it's attributes
+                - get_dish(): gets the match needed from Freezer
+            [ ]. update the match results on the db
+                - update_dish(): updates the match result in Freezre
+            [ ]. if successfully updated return True else return False
+        add_results_as_spice [summary]
+        """
+        try:
+            history_recipe = requests.get("https://hsitoriiquebet.blogspot.com/")
+            history_recipe.raise_for_status()
+        except (
+            exceptions.ConnectionError,
+            exceptions.Timeout,
+            exceptions.TooManyRedirects
+        ) as e:
+            logger.exception(f"exception hit -- {e}")
+
+        def pick_out(row):
+            """
+            This methods is used to pick out texts from the row. These include
+            the time, teams and odds.
 
             Args:
                 row (NavigableString): The row that contains the texts

@@ -1,15 +1,18 @@
 
 import pickle
 import unittest
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import (MagicMock, Mock, patch)
 
-from requests import exceptions, status_codes
+from requests import (exceptions, status_codes)
 from src.cooker import Cooker
 
 
 class CookerTestSuites(unittest.TestCase):
     """
-    tests the Cooker class.
+    CookerTestSuites: tests the Cooker class.
+
+    Args:
+        unittest (TestCase): A class whose instances are single test cases that are inherited.
     """
     def setUp(self):
         self.cooker = Cooker("https://viiiiiptips.blogspot.com/")
@@ -47,12 +50,10 @@ class CookerTestSuites(unittest.TestCase):
     def test_cook_recipe_with_requests_mocked(self):
         with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
             mock_requests.side_effect = None
-            mock_requests.get.return_value = pickle.load(
-                open(
-                    'somethingsomething.xyz',
-                    'rb'
-                )
-            )
+            f = open('somethingsomething.xyz', 'rb')
+            mock_requests.get.return_value = pickle.load(f)
+            f.close()
+
             self.cooker.get_recipe()
             self.cooker.cook_recipe()
             self.assertIsInstance(self.cooker.meaty_list, list)
@@ -62,3 +63,14 @@ class CookerTestSuites(unittest.TestCase):
             self.assertIn("teams", dict_1st.keys())
             self.assertIn("1.44", dict_1st.values())
             mock_requests.get.assert_called_with("https://viiiiiptips.blogspot.com/")
+
+    def test_add_spicy_results(self):
+        with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
+            mock_requests.side_effect = exceptions.RequestException
+            f = open('pickled_request_obj_with_results.xyz', 'rb')
+            mock_requests.get.return_value = pickle.load(f)
+            f.close()
+
+            self.cooker.get_recipe()
+            ret_val = self.cooker.add_results_as_spice()
+            mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/")
