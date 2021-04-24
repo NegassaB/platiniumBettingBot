@@ -64,13 +64,13 @@ class CookerTestSuites(unittest.TestCase):
             self.assertIn("1.44", dict_1st.values())
             mock_requests.get.assert_called_with("https://viiiiiptips.blogspot.com/")
 
-    def test_add_spicy_results(self):
-        with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
-            mock_requests.side_effect = exceptions.RequestException
-            f = open('pickled_request_obj_with_results.xyz', 'rb')
-            mock_requests.get.return_value = pickle.load(f)
-            f.close()
+    # def test_add_spicy_results(self):
+    #     with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
+    #         mock_requests.side_effect = exceptions.RequestException
+    #         f = open('pickled_request_obj_with_results.xyz', 'rb')
+    #         mock_requests.get.return_value = pickle.load(f)
+    #         f.close()
 
-            self.cooker.get_recipe()
-            ret_val = self.cooker.add_results_as_spice()
-            mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/")
+    #         self.cooker.get_recipe()
+    #         ret_val = self.cooker.add_results_as_spice()
+    #         mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/")
