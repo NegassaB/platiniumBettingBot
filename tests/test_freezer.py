@@ -1,7 +1,6 @@
 import unittest
 import datetime
 import dateutil.parser
-from datetime import timezone
 from unittest.mock import (MagicMock, patch)
 
 from src.freezer import (
@@ -76,7 +75,18 @@ class FreezerTestSuites(unittest.TestCase):
         val = PlatiniumBotContent.get(
             PlatiniumBotContent.platinium_content_teams == 'Slavia Prague - Rangers'
         )
+
         self.assertEqual(val.platinium_content_country, 'euro.L')
+        self.assertEqual(val.platinium_content_teams, 'Slavia Prague - Rangers')
+        self.assertEqual(val.platinium_content_time, '17:55')
+        self.assertEqual(val.platinium_content_odds, '1.38')
+        self.assertEqual(val.platinium_content_winlose, "")
+        self.assertEqual(val.platinium_content_3ways, 'over 1.5')
+        self.assertEqual(val.platinium_content_result, "")
+        self.assertGreaterEqual(
+            val.platinium_content_posted_timestamp,
+            str(datetime.datetime.today().date())
+        )
 
     def test_get_bot_content_today(self):
         """
@@ -95,8 +105,33 @@ class FreezerTestSuites(unittest.TestCase):
         )
         self.assertEqual(val_posted_date.date(), datetime.datetime.today().date())
 
-    def test_update_bot_content(self):
-        pass
+    # def test_get_bot_content_yesterday(self):
+    #     """
+    #     todo:
+    #         [ ]. add a new method add_content_yesterday_for_testing()
+    #     test_get_bot_content_yesterday [summary]
+    #     """
+    #     add_content_yesterday_for_testing(self.test_freezer_obj)
+    #     content_yesterday = self.test_freezer_obj.get_bot_content_yesterday()
+    #     self.assertIsInstance(content_yesterday, list)
+    #     self.assertGreater(len(content_yesterday), 0)
+    #     val1 = content_yesterday.pop(0)
+    #     self.assertIsInstance(val1, dict)
+    #     self.assertIn("platinium_content_time", val1.keys())
+    #     self.assertIn("platinium_content_result", val1.keys())
+    #     self.assertIn("over 1.5", val1.values())
+    #     val_posted_date = dateutil.parser.parse(
+    #         val1["platinium_content_posted_timestamp"]
+    #     )
+    #     yesterday_date = datetime.datetime.today() - datetime.timedelta(days=1)
+    #     self.assertEqual(val_posted_date.date(), yesterday_date.date())
+
+    # def test_update_bot_content(self):
+    #     add_content_for_testing(self.test_freezer_obj)
+    #     list_updated_matches = self.test_freezer_obj.update_bot_content()
+    #     for match_dict in list_updated_matches:
+    #         self.assertIsNot(match_dict['platinium_content_result'], "")
+    #         self.assertGreater(len(match_dict['platinium_content_result']), 0)
 
 
 def add_user_for_testing(freezer_obj):
@@ -158,6 +193,10 @@ def add_content_for_testing(freezer_obj):
             content_list['country'],
             content_list['3ways']
         )
+
+
+def add_content_yesterday_for_testing(freezer_obj):
+    pass
 
 
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):

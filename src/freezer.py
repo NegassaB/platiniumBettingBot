@@ -222,6 +222,14 @@ class Freezer():
             self.close_freezer()
 
     def update_bot_content(self):
+        """
+        todo:
+            [ ]. get_botcontent_yesterday() that will retrieve all the matches from the day before as list of dict.
+            [ ]. get each match in accordance with the given parameter/s.
+            [ ]. for match in yesterday_match: update match.platinium_content_result, match.save()
+            [ ]. return updated list of dict of matches.
+        update_bot_content [summary]
+        """
         pass
 
 
@@ -260,6 +268,7 @@ class PlatiniumBotContent(BaseFarm):
     platinium_content_time = peewee.CharField(10)
     platinium_content_teams = peewee.TextField()
     platinium_content_odds = peewee.CharField(10)
+    platinium_content_winlose = peewee.CharField(default="")
     platinium_content_country = peewee.CharField(30)
     platinium_content_3ways = peewee.CharField(25)
     # todo update this when results b/me available after you scrape it
