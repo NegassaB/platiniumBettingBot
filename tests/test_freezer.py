@@ -9,7 +9,6 @@ from src.freezer import (
     BaseFarm,
     PlatiniumBotUser
 )
-# from tests.do_something import add_user_for_testing
 
 
 class FreezerTestSuites(unittest.TestCase):
