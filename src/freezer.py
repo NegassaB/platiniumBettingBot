@@ -20,11 +20,9 @@ database_proxy = peewee.DatabaseProxy()
 class Freezer():
     """
     todo:
-        [ ]. build add_new_content()
-            in this find a way to to get the actual message instead of the fk
-        [ ]. build add_new_message()
-        []. build a way to update platinium_content_posted_timestamp after posting
-        [ ]. build the CRUD operation methods
+        [x]. update add_new_user() according to the new details
+        [x]. update get_bot_user() according to the new details
+        [x]. rename update_bot_user() to delete_bot_user(), actions are similar
 
     Freezer [summary]
 
@@ -91,8 +89,6 @@ class Freezer():
         tbl_list = []
         if not self.freezer.table_exists("table_PlatiniumBotUser"):
             tbl_list.append(PlatiniumBotUser)
-        if not self.freezer.table_exists("table_PlatiniumBotContent"):
-            tbl_list.append(PlatiniumBotContent)
 
         if len(tbl_list) != 0:
             try:
@@ -157,9 +153,9 @@ class Freezer():
         finally:
             self.close_freezer()
 
-    def update_bot_user(self, active_status, telegram_id):
+    def delete_bot_user(self, active_status, telegram_id):
         """
-        update_bot_user [summary]
+        delete_bot_user [summary]
 
         Args:
             active_status ([type]): [description]
@@ -171,58 +167,15 @@ class Freezer():
         user_2_update = self.get_bot_user(telegram_id)
         if self.freezer.is_closed():
             self.open_freezer()
-        user_2_update.bot_user_active = active_status
-        user_2_update.save()
-
-    def add_new_content(self, content_time, content_teams, content_odds, content_country, content_3ways):
-        """
-        add_new_content [summary]
-
-        Args:
-            content_time ([type]): [description]
-            content_teams ([type]): [description]
-            content_odds ([type]): [description]
-            content_country ([type]): [description]
-            content_3ways ([type]): [description]
-        """
-        if self.freezer.is_closed():
-            self.open_freezer()
         try:
-            PlatiniumBotContent.create(
-                platinium_content_time=content_time,
-                platinium_content_teams=content_teams,
-                platinium_content_odds=content_odds,
-                platinium_content_country=content_country,
-                platinium_content_3ways=content_3ways
-            )
+            user_2_update.bot_user_active = active_status
+            user_2_update.save()
         except peewee.PeeweeException as pex:
             logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
         except Exception as e:
             logger.exception(f"Exception occurred -- {e}", exc_info=True)
         finally:
             self.close_freezer()
-
-    def get_bot_content_today(self):
-        """
-        get_bot_content [summary]
-        """
-        if self.freezer.is_closed():
-            self.open_freezer()
-        try:
-            return list(
-                PlatiniumBotContent.select().where(
-                    PlatiniumBotContent.platinium_content_posted_timestamp >= datetime.today().date()
-                ).dicts()
-            )
-        except peewee.PeeweeException as pex:
-            logger.exception(f"PeeweeException occurred -- {pex}", exc_info=True)
-        except Exception as e:
-            logger.exception(f"Exception occurred -- {e}", exc_info=True)
-        finally:
-            self.close_freezer()
-
-    def update_bot_content(self):
-        pass
 
 
 class BaseFarm(peewee.Model):
@@ -245,6 +198,7 @@ class PlatiniumBotUser(BaseFarm):
         default="00000000000000"
     )
 
+    # todo: set this to in-active if the user stops & deletes the bot
     bot_user_active = peewee.BooleanField(default=True, null=False)
     bot_user_joined_timestamp = peewee.DateTimeField(
         null=False,
@@ -253,23 +207,3 @@ class PlatiniumBotUser(BaseFarm):
 
     class Meta():
         table_name = "table_PlatiniumBotUser"
-
-
-class PlatiniumBotContent(BaseFarm):
-    platinium_content_id = peewee.AutoField(primary_key=True, null=False)
-    platinium_content_time = peewee.CharField(10)
-    platinium_content_teams = peewee.TextField()
-    platinium_content_odds = peewee.CharField(10)
-    platinium_content_country = peewee.CharField(30)
-    platinium_content_3ways = peewee.CharField(25)
-    # todo update this when results b/me available after you scrape it
-    platinium_content_result = peewee.TextField(default="")
-
-    # todo update this when the content is posted
-    platinium_content_posted_timestamp = peewee.DateTimeField(
-        null=False,
-        default=datetime.now(tz=timezone.utc),
-    )
-
-    class Meta():
-        table_name = "table_PlatiniumBotContent"

@@ -1,17 +1,14 @@
 import unittest
 import datetime
 import dateutil.parser
-from datetime import timezone
 from unittest.mock import (MagicMock, patch)
 
 from src.freezer import (
     peewee,
     Freezer,
     BaseFarm,
-    PlatiniumBotUser,
-    PlatiniumBotContent
+    PlatiniumBotUser
 )
-# from tests.do_something import add_user_for_testing
 
 
 class FreezerTestSuites(unittest.TestCase):
@@ -46,7 +43,6 @@ class FreezerTestSuites(unittest.TestCase):
             print(f"test failed due to exception {e}")
         else:
             self.assertTrue(self.test_freezer_obj.freezer.table_exists("table_PlatiniumBotUser"))
-            self.assertTrue(self.test_freezer_obj.freezer.table_exists("table_PlatiniumBotContent"))
 
     def test_add_new_bot_user(self):
         add_user_for_testing(self.test_freezer_obj)
@@ -60,43 +56,16 @@ class FreezerTestSuites(unittest.TestCase):
             self.assertEqual(user.user_telegram_id, self.tlg_user_id)
             self.assertEqual(user.bot_user_name, self.tlg_username)
 
-    def test_update_bot_user(self):
+    def test_delete_bot_user(self):
         add_user_for_testing(self.test_freezer_obj)
-
-        self.test_freezer_obj.update_bot_user(
-            active_status=self.tlg_active_status,
-            telegram_id=self.tlg_user_id
+        user_2_check = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+        self.test_freezer_obj.delete_bot_user(False, self.tlg_user_id)
+        user_after_deletion = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
+        self.assertFalse(user_after_deletion.bot_user_active)
+        self.assertNotEqual(
+            user_2_check.bot_user_active,
+            user_after_deletion.bot_user_active
         )
-
-        user = self.test_freezer_obj.get_bot_user(self.tlg_user_id)
-        self.assertFalse(user.bot_user_active)
-
-    def test_add_new_content(self):
-        add_content_for_testing(self.test_freezer_obj)
-        val = PlatiniumBotContent.get(
-            PlatiniumBotContent.platinium_content_teams == 'Slavia Prague - Rangers'
-        )
-        self.assertEqual(val.platinium_content_country, 'euro.L')
-
-    def test_get_bot_content_today(self):
-        """
-        test_get_bot_content [summary]
-        """
-        add_content_for_testing(self.test_freezer_obj)
-        content = self.test_freezer_obj.get_bot_content_today()
-        self.assertIsInstance(content, list)
-        self.assertGreater(len(content), 0)
-        val1 = content.pop(0)
-        self.assertIsInstance(val1, dict)
-        self.assertIn("platinium_content_time", val1.keys())
-        self.assertIn("over 1.5", val1.values())
-        val_posted_date = dateutil.parser.parse(
-            val1["platinium_content_posted_timestamp"]
-        )
-        self.assertEqual(val_posted_date.date(), datetime.datetime.today().date())
-
-    def test_update_bot_content(self):
-        pass
 
 
 def add_user_for_testing(freezer_obj):
@@ -140,34 +109,11 @@ def add_user_for_testing(freezer_obj):
         print("both username & phone NOT NONE")
 
 
-def add_content_for_testing(freezer_obj):
-    content_list = {
-        'time': '17:55',
-        'teams': 'Slavia Prague - Rangers',
-        'odds': '1.38',
-        'country': 'euro.L',
-        '3ways': 'over 1.5'
-    }
-    x = 5
-    while x != 0:
-        x -= 1
-        freezer_obj.add_new_content(
-            content_list['time'],
-            content_list['teams'],
-            content_list['odds'],
-            content_list['country'],
-            content_list['3ways']
-        )
-
-
 class PlatiniumBotUserModelTestSuites(unittest.TestCase):
 
     def setUp(self):
         self.platinium_bot_user = PlatiniumBotUser()
-        self.platinium_bot_content = PlatiniumBotContent()
 
     def test_models_instance_basemodel(self):
         self.assertIsInstance(self.platinium_bot_user, BaseFarm)
         self.assertIsInstance(self.platinium_bot_user, peewee.Model)
-        self.assertIsInstance(self.platinium_bot_content, BaseFarm)
-        self.assertIsInstance(self.platinium_bot_content, peewee.Model)

@@ -55,7 +55,11 @@ class Cooker():
         try:
             self.sauce = requests.get(self.source_url)
             self.sauce.raise_for_status()
-        except (exceptions.ConnectionError, exceptions.Timeout, exceptions.TooManyRedirects) as e:
+        except (
+            exceptions.ConnectionError,
+            exceptions.Timeout,
+            exceptions.TooManyRedirects
+        ) as e:
             logger.exception(f"exception hit -- {e}")
 
     def cook_recipe(self):
@@ -119,15 +123,21 @@ class Cooker():
             [ ]. if successfully updated return True else return False
         add_results_as_spice [summary]
         """
-        try:
-            history_recipe = requests.get("https://hsitoriiquebet.blogspot.com/")
-            history_recipe.raise_for_status()
-        except (
-            exceptions.ConnectionError,
-            exceptions.Timeout,
-            exceptions.TooManyRedirects
-        ) as e:
-            logger.exception(f"exception hit -- {e}")
+
+        def get_spice_result():
+            try:
+                history_recipe = requests.get("https://hsitoriiquebet.blogspot.com/")
+                history_recipe.raise_for_status()
+            except (
+                exceptions.ConnectionError,
+                exceptions.Timeout,
+                exceptions.TooManyRedirects
+            ) as e:
+                logger.exception(f"exception hit -- {e}")
+
+        yesterday_soup = bs.BeautifulSoup(history_recipe, 'html.parser')
+        yesterday_soup_list = []
+        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
 
         def pick_out(row):
             """
