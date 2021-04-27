@@ -4,7 +4,7 @@ import unittest
 from unittest.mock import (MagicMock, Mock, patch)
 
 from requests import (exceptions, status_codes)
-from src.cooker import Cooker
+from src.cooker import (Cooker, bs)
 
 
 class CookerTestSuites(unittest.TestCase):
@@ -22,12 +22,12 @@ class CookerTestSuites(unittest.TestCase):
 
     def test_get_recipe_is_called(self):
         with patch('src.cooker.requests') as mock_test_cooker_requests:
-            self.cooker.get_recipe()
+            self.cooker.get_sauce()
             mock_test_cooker_requests.get.assert_called()
 
     def test_get_recipe_response_is_ok(self):
         with patch('src.cooker.requests') as mock_cooker_requests:
-            self.cooker.get_recipe()
+            self.cooker.get_sauce()
             mock_cooker_requests.get.return_value = 200
             self.assertEqual(
                 mock_cooker_requests.get.return_value,
@@ -38,13 +38,13 @@ class CookerTestSuites(unittest.TestCase):
         with patch('src.cooker.requests') as mock_cooker_requests:
             mock_cooker_requests.get.side_effect = exceptions.RequestException
             with self.assertRaises(exceptions.RequestException):
-                self.cooker.get_recipe()
+                self.cooker.get_sauce()
 
     def test_cook_recipe_is_called(self):
         with patch('src.cooker.requests') as mock_cooker_requests:
-            self.cooker.get_recipe()
+            self.cooker.get_sauce()
         with patch('src.cooker.bs') as mock_cooker_bs:
-            self.cooker.cook_recipe()
+            self.cooker.cook_sauce()
             mock_cooker_bs.BeautifulSoup.assert_called()
 
     def test_cook_recipe_with_requests_mocked(self):
@@ -54,23 +54,7 @@ class CookerTestSuites(unittest.TestCase):
             mock_requests.get.return_value = pickle.load(f)
             f.close()
 
-            self.cooker.get_recipe()
-            self.cooker.cook_recipe()
-            self.assertIsInstance(self.cooker.meaty_list, list)
-            self.assertGreater(len(self.cooker.meaty_list), 0)
-            dict_1st = self.cooker.meaty_list.pop(0)
-            self.assertIsInstance(dict_1st, dict)
-            self.assertIn("teams", dict_1st.keys())
-            self.assertIn("1.44", dict_1st.values())
+            self.cooker.get_sauce()
+            res = self.cooker.cook_sauce()
+            self.assertIsInstance(res, bs.element.Tag)
             mock_requests.get.assert_called_with("https://viiiiiptips.blogspot.com/")
-
-    # def test_add_spicy_results(self):
-    #     with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
-    #         mock_requests.side_effect = exceptions.RequestException
-    #         f = open('pickled_request_obj_with_results.xyz', 'rb')
-    #         mock_requests.get.return_value = pickle.load(f)
-    #         f.close()
-
-    #         self.cooker.get_recipe()
-    #         ret_val = self.cooker.add_results_as_spice()
-    #         mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/")
