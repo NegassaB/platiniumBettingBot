@@ -27,6 +27,14 @@ class Chef():
 
 class Cooker():
     """
+    todo:
+        [ ] - request.get the url data
+        [ ] - get the sauce
+        [ ] - gather all the tables from the sauce
+        [ ] - gather all the rows
+        [ ] - find a way to identify the td with the stars
+        [ ] - count the number of star imgs inside the td with the stars
+        [ ] - return the table
     doc:
     Cooker [summary]
 
