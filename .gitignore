@@ -2,6 +2,7 @@
 .gitignore~
 ..gitignore.un~
 .README.md.un~
+*.swp
 
 # envs
 venv/
