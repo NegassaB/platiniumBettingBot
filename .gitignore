@@ -21,3 +21,4 @@ __pycache__/
 
 # other files
 sms_numbers_sep252020.csv
+*.session*

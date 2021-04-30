@@ -84,5 +84,6 @@ class Cooker():
             [ResultSet]: 'bs4.element.ResultSet' that contains all the tables
                          found in the sauce.
         """
+        # self.get_sauce()
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
         return self.soup.find_all('table')
