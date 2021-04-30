@@ -12,19 +12,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-class Chef():
-    """
-    todo:
-        * chef module is the one that does the cooking, cooker module is the stove. Doesn't matter
-            what you put on it, it will cook it. But it's the chef that decides what to cook, how to cook,
-            what to add etc. Thus chef module is responsible for passing the ingredients (source urls),
-            adding the necessary spices, getting the result, passing it onto the waiters to serve (waiter module)
-    Chef [summary]
-    """
-    def __init__(self):
-        pass
-
-
 class Cooker():
     """
     todo:
