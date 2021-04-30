@@ -91,19 +91,11 @@ class Cooker():
 
             When called, this method will take in the sauce created in
             get_sauce() and proceed to create a bs object from it and
-            retrieve the necessary details. The way it does that is by getting
-            the table from the bs object and then parsing all the rows out of
-            that bs object into the 'all_rows' ResultSet object.
-            From that it pops the 1st and last rows and proceeds to get into a
-            while loop that will pop two rows at once and insert the data from
-            those rows into a tuple that will contain them.
+            retrieve & return all the tables found in sauce.
 
         Returns:
-            [type]: [description]
+            [ResultSet]: 'bs4.element.ResultSet' that contains all the tables
+                         found in the sauce.
         """
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
-        # todo: perhaps return the entire table
-        resp_table = self.soup.find("table")
-        print(resp_table)
-        all_tr = resp_table.find_all("tr")
-        return resp_table
+        return self.soup.find_all('table')
