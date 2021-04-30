@@ -1,0 +1,4 @@
+This shall hold all the practical knowledge gained in the pursuit of this project:
+
+* figured that if I return the entire html tag when it's is posted in html_mode via the bot,
+    then the css as well as the urls will be rendered.
