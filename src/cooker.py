@@ -85,5 +85,6 @@ class Cooker():
                          found in the sauce.
         """
         # self.get_sauce()
+        # todo: add headers={'user-agent': 'android/chrome/etc'}
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
         return self.soup.find_all('table')
