@@ -90,5 +90,5 @@ class Cooker():
                          found in the sauce.
         """
         self.get_sauce()
-        self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
+        self.soup = bs.BeautifulSoup(self.sauce.content, 'html5lib')
         return self.soup.find_all('table')
