@@ -70,6 +70,11 @@ class CookerTestSuites(unittest.TestCase):
 
     def test_cook_recipe_with_requests_mocked(self):
         with patch('src.cooker.requests', autospec=True, spec_set=True) as mock_requests:
+            agent_str = "Mozilla/5.0 (Linux; Android 10; SM-A207F Build/QP1A.190711.020) " + \
+                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.82 Mobile Safari/537.36 OPT/2.9"
+            req_headers = {
+                "User-Agent": agent_str
+            }
             mock_requests.side_effect = None
             f = open('data/pickled_data/pickled_viptips.xyz', 'rb')
             g = open('data/pickled_data/pickled_combotips.xyz', 'rb')
@@ -81,13 +86,13 @@ class CookerTestSuites(unittest.TestCase):
             # self.vip_cooker.get_sauce()
             # self.combo_cooker.get_sauce()
             # self.gold_cooker.get_sauce()
-            self.history_cooker.get_sauce()
-            # res = self.vip_cooker.cook_sauce()
+            # self.history_cooker.get_sauce()
+            res = self.vip_cooker.cook_sauce()
             # res = self.combo_cooker.cook_sauce()
             # res = self.gold_cooker.cook_sauce()
-            res = self.history_cooker.cook_sauce()
+            # res = self.history_cooker.cook_sauce()
             self.assertIsInstance(res, bs.element.ResultSet)
-            # mock_requests.get.assert_called_with("https://xxviptips.blogspot.com/")
-            # mock_requests.get.assert_called_with("https://xxcombotips.blogspot.com/")
-            # mock_requests.get.assert_called_with("https://xxgoldtips.blogspot.com/")
-            mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/")
+            mock_requests.get.assert_called_with("https://xxviptips.blogspot.com/", headers=req_headers)
+            # mock_requests.get.assert_called_with("https://xxcombotips.blogspot.com/", headers=req_headers)
+            # mock_requests.get.assert_called_with("https://xxgoldtips.blogspot.com/", headers=req_headers)
+            # mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/", headers=req_headers)

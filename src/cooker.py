@@ -60,8 +60,13 @@ class Cooker():
             ConnectionError, Timeout, TooManyRedirects from the module
             requests.
         """
+        agent_str = "Mozilla/5.0 (Linux; Android 10; SM-A207F Build/QP1A.190711.020) " + \
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.82 Mobile Safari/537.36 OPT/2.9"
+        req_headers = {
+            "User-Agent": agent_str
+        }
         try:
-            self.sauce = requests.get(self.source_url)
+            self.sauce = requests.get(self.source_url, headers=req_headers)
             self.sauce.raise_for_status()
         except (
             exceptions.ConnectionError,
@@ -84,7 +89,6 @@ class Cooker():
             [ResultSet]: 'bs4.element.ResultSet' that contains all the tables
                          found in the sauce.
         """
-        # self.get_sauce()
-        # todo: add headers={'user-agent': 'android/chrome/etc'}
+        self.get_sauce()
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
         return self.soup.find_all('table')
