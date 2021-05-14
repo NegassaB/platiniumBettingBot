@@ -46,10 +46,12 @@ class Cooker():
     def get_sauce(self):
         """
         doc:
-        This method fetches from the url provided using requests.
+        This method fetches from the url provided using requests using the headers set.
 
         Desc:
-            It gets the necessary information from the provided url.
+            It gets the necessary information from the provided url via requests and the headers set.
+            If successful it will updated the self.sauce object with requests.Response.
+            If it fails it will raise the necessary status and exit.
         Attributes:
         Args:
             self
@@ -77,18 +79,29 @@ class Cooker():
 
     def cook_sauce(self):
         """
-        doc:
-        cook_sauce: takes in the sauce created in get_sauce() & create
-            bs object from it and retrieve the necessary details.
+        fix: this doesn't work for combo tips, crashes during the retrival of match, threeway, odds
 
-            When called, this method will take in the sauce created in
-            get_sauce() and proceed to create a bs object from it and
-            retrieve & return all the tables found in sauce.
+        cook_sauce: creates beautiful soup object and parses the necessary details out of it.
+
+        Desc: When called, this method will take in the sauce created in get_sauce() and
+              proceed to create a beautiful soup object from it and parse all the tables found in the website.
+              Lastly it returns all the tables found in sauce as a list of lists.
 
         Returns:
-            [ResultSet]: 'bs4.element.ResultSet' that contains all the tables
-                         found in the sauce.
+            [List]: named viptips_match_list that contains lists. Each list inside viptips_match_list
+                    represents one match found in the website.
         """
+        viptips_match_list = list()
         self.get_sauce()
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html5lib')
-        return self.soup.find_all('table')
+
+        for table in self.soup.select('table'):
+            rows = table.select('tr')
+            league = rows[0].get_text(strip=True)
+            match, threeway, odds = [td.get_text(strip=True) for td in rows[1].select('td')]
+            rate_star = " ".join([":star:"] * len(rows[2].select('img')))
+            _, final_score = [td.get_text(strip=True) for td in rows[3].select('td')]
+            viptips_match_list.append(
+                [league, match, threeway, odds, rate_star, final_score]
+            )
+        return viptips_match_list

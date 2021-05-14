@@ -1,23 +1,36 @@
 import pickle
 import bs4 as bs
-from markdownify import markdownify as md
 
 v_file = open('data/pickled_data/pickled_viptips.xyz', 'rb')
 v_pickled = pickle.load(v_file)
+h_file = open('data/pickled_data/pickled_history.xyz', 'rb')
+h_pickled = pickle.load(h_file)
 
 viptips = bs.BeautifulSoup(v_pickled.content, "html5lib")
+history = bs.BeautifulSoup(h_pickled.content, "html5lib")
+
+table_data = []
 
 for table in viptips.select("table"):
+# for table in history.select("table"):
     rows = table.select("tr")
     league = rows[0].get_text(strip=True)
     match, info1, info2 = [td.get_text(strip=True) for td in rows[1].select("td")]
+    # for td in rows[1].select('td'):
+    #     print(td.get_text(strip=True))
     rate_star = " ".join([":star:"] * len(rows[2].select("img")))
-    final_score_title, final_score = [
-        "no results yet" if td.get_text(strip=True) == "" else td.get_text(strip=True) for td in rows[3].select('td')
-    ]
+    _, final_score = [td.get_text(strip=True) for td in rows[3].select('td')]
+    # final_score_title, final_score = [
+    #     "no results yet" if td.get_text(strip=True) == "" else td.get_text(strip=True) for td in rows[3].select('td')
+    # ]
+    table_data.append(
+        {"league": league, "match": match, "info1": info1, "info2": info2, "rate_star": rate_star, "final_score": final_score}
+    )
+    # table_data.append([league, match, info1, info2, rate_star, final_score])
 
-    print(f"{league}, {match}, {info1}, {info2}, {rate_star}, {final_score_title} -- {final_score}")
+    # print(f"{league}, {match}, {info1}, {info2}, {rate_star}, {final_score_title} -- {final_score}")
 
+print(f"table data is -- {table_data}")
 
 all_tbls = viptips.find_all('table')
 

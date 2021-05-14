@@ -1,5 +1,6 @@
 
 import pickle
+from typing import List
 import unittest
 from unittest.mock import (MagicMock, Mock, patch)
 
@@ -75,24 +76,44 @@ class CookerTestSuites(unittest.TestCase):
             req_headers = {
                 "User-Agent": agent_str
             }
+
             mock_requests.side_effect = None
             f = open('data/pickled_data/pickled_viptips.xyz', 'rb')
             g = open('data/pickled_data/pickled_combotips.xyz', 'rb')
             h = open('data/pickled_data/pickled_goldtips.xyz', 'rb')
             j = open('data/pickled_data/pickled_history.xyz', 'rb')
+
             mock_requests.get.return_value = pickle.load(f)
             f.close()
-
-            # self.vip_cooker.get_sauce()
-            # self.combo_cooker.get_sauce()
-            # self.gold_cooker.get_sauce()
-            # self.history_cooker.get_sauce()
             res = self.vip_cooker.cook_sauce()
-            # res = self.combo_cooker.cook_sauce()
-            # res = self.gold_cooker.cook_sauce()
-            # res = self.history_cooker.cook_sauce()
-            self.assertIsInstance(res, bs.element.ResultSet)
             mock_requests.get.assert_called_with("https://xxviptips.blogspot.com/", headers=req_headers)
+
+            # mock_requests.get.return_value = pickle.load(g)
+            # g.close()
+            # res1 = self.combo_cooker.cook_sauce()
             # mock_requests.get.assert_called_with("https://xxcombotips.blogspot.com/", headers=req_headers)
-            # mock_requests.get.assert_called_with("https://xxgoldtips.blogspot.com/", headers=req_headers)
-            # mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/", headers=req_headers)
+
+            mock_requests.get.return_value = pickle.load(h)
+            h.close()
+            res2 = self.gold_cooker.cook_sauce()
+            mock_requests.get.assert_called_with("https://xxgoldtips.blogspot.com/", headers=req_headers)
+
+            mock_requests.get.return_value = pickle.load(j)
+            j.close()
+            res3 = self.history_cooker.cook_sauce()
+            mock_requests.get.assert_called_with("https://hsitoriiquebet.blogspot.com/", headers=req_headers)
+
+            self.assertIsInstance(res, List)
+            # self.assertIsInstance(res1, List)
+            self.assertIsInstance(res2, List)
+            self.assertIsInstance(res3, List)
+
+            one_res = res.pop()
+            # two_res = res1.pop()
+            three_res = res2.pop()
+            four_res = res3.pop()
+
+            self.assertIsInstance(one_res, List)
+            # self.assertIsInstance(two_res, List)
+            self.assertIsInstance(three_res, List)
+            self.assertIsInstance(four_res, List)
