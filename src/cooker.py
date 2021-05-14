@@ -14,6 +14,14 @@ logger = logging.getLogger(__name__)
 
 class Cooker():
     """
+    todo:
+        [ ] - request.get the url data
+        [ ] - get the sauce
+        [ ] - gather all the tables from the sauce
+        [ ] - gather all the rows
+        [ ] - find a way to identify the td with the stars
+        [ ] - count the number of star imgs inside the td with the stars
+        [ ] - return the table
     doc:
     Cooker [summary]
 
@@ -35,13 +43,15 @@ class Cooker():
         """
         self.source_url = source_url
 
-    def get_recipe(self):
+    def get_sauce(self):
         """
         doc:
-        This method fetches from the url provided using requests.
+        This method fetches from the url provided using requests using the headers set.
 
         Desc:
-            It gets the necessary information from the provided url.
+            It gets the necessary information from the provided url via requests and the headers set.
+            If successful it will updated the self.sauce object with requests.Response.
+            If it fails it will raise the necessary status and exit.
         Attributes:
         Args:
             self
@@ -52,8 +62,13 @@ class Cooker():
             ConnectionError, Timeout, TooManyRedirects from the module
             requests.
         """
+        agent_str = "Mozilla/5.0 (Linux; Android 10; SM-A207F Build/QP1A.190711.020) " + \
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.82 Mobile Safari/537.36 OPT/2.9"
+        req_headers = {
+            "User-Agent": agent_str
+        }
         try:
-            self.sauce = requests.get(self.source_url)
+            self.sauce = requests.get(self.source_url, headers=req_headers)
             self.sauce.raise_for_status()
         except (
             exceptions.ConnectionError,
@@ -62,114 +77,31 @@ class Cooker():
         ) as e:
             logger.exception(f"exception hit -- {e}")
 
-    def cook_recipe(self):
+    def cook_sauce(self):
         """
-        doc:
-        cook_recipe: takes in the sauce created in get_recipe() & create
-            bs object from it and retrieve the necessary details.
+        fix: this doesn't work for combo tips, crashes during the retrival of match, threeway, odds
 
-            When called, this method will take in the sauce created in
-            get_recipe() and proceed to create a bs object from it and
-            retrieve the necessary details. The way it does that is by getting
-            the table from the bs object and then parsing all the rows out of
-            that bs object into the 'all_rows' ResultSet object.
-            From that it pops the 1st and last rows and proceeds to get into a
-            while loop that will pop two rows at once and insert the data from
-            those rows into a tuple that will contain them.
+        cook_sauce: creates beautiful soup object and parses the necessary details out of it.
+
+        Desc: When called, this method will take in the sauce created in get_sauce() and
+              proceed to create a beautiful soup object from it and parse all the tables found in the website.
+              Lastly it returns all the tables found in sauce as a list of lists.
 
         Returns:
-            [type]: [description]
+            [List]: named viptips_match_list that contains lists. Each list inside viptips_match_list
+                    represents one match found in the website.
         """
-        def pick_out(row):
-            """
-            This methods is used to pick out texts from the row. These include
-            the time, teams and odds.
+        matches_list = list()
+        self.get_sauce()
+        self.soup = bs.BeautifulSoup(self.sauce.content, 'html5lib')
 
-            Args:
-                row (NavigableString): The row that contains the texts
-                that are required.
-
-            Returns:
-                list: a list_of_vals populated with the values in each row.
-            """
-            for pickings in row.find_all('td'):
-                val = pickings.text.strip()
-                if len(val) != 0:
-                    list_of_vals.append(pickings.text.strip())
-
-        self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
-        self.meaty_list = []
-        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
-        list_of_vals = []
-        table = self.soup.find("table")
-        all_rows = table.find_all('tr')
-        _, _ = all_rows.pop(0), all_rows.pop(-1)
-        while len(all_rows) != 0:
-            row1, row2 = all_rows.pop(0), all_rows.pop(0)
-            pick_out(row1)
-            pick_out(row2)
-            self.meaty_list.append(dict(zip(list_of_keys, list_of_vals)))
-            list_of_vals.clear()
-
-    def add_results_as_spice(self):
-        """
-        todo:
-            [ ]. get the results from the history site
-            [ ]. parse the results out of the html page
-            [ ]. find the match it belongs to by using one of it's attributes
-                - get_dish(): gets the match needed from Freezer
-            [ ]. update the match results on the db
-                - update_dish(): updates the match result in Freezre
-            [ ]. if successfully updated return True else return False
-        add_results_as_spice [summary]
-        """
-
-        def get_spice_result():
-            try:
-                history_recipe = requests.get("https://hsitoriiquebet.blogspot.com/")
-                history_recipe.raise_for_status()
-            except (
-                exceptions.ConnectionError,
-                exceptions.Timeout,
-                exceptions.TooManyRedirects
-            ) as e:
-                logger.exception(f"exception hit -- {e}")
-
-        yesterday_soup = bs.BeautifulSoup(history_recipe, 'html.parser')
-        yesterday_soup_list = []
-        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
-
-        def pick_out(row):
-            """
-            This methods is used to pick out texts from the row. These include
-            the time, teams and odds.
-
-            Args:
-                row (NavigableString): The row that contains the texts
-                that are required.
-
-            Returns:
-                list: a list_of_vals populated with the values in each row.
-            """
-            for pickings in row.find_all('td'):
-                val = pickings.text.strip()
-                if len(val) != 0:
-                    list_of_vals.append(pickings.text.strip())
-
-        self.soup = bs.BeautifulSoup(self.sauce.content, 'html.parser')
-        self.meaty_list = []
-        list_of_keys = ["time", "teams", "odds", "country", "3ways"]
-        list_of_vals = []
-        table = self.soup.find("table")
-        all_rows = table.find_all('tr')
-        _, _ = all_rows.pop(0), all_rows.pop(-1)
-        while len(all_rows) != 0:
-            row1, row2 = all_rows.pop(0), all_rows.pop(0)
-            pick_out(row1)
-            pick_out(row2)
-            self.meaty_list.append(dict(zip(list_of_keys, list_of_vals)))
-            list_of_vals.clear()
-
-    @classmethod
-    def connect(none):
-        pass
+        for table in self.soup.select('table'):
+            rows = table.select('tr')
+            league = rows[0].get_text(strip=True)
+            match, threeway, odds = [td.get_text(strip=True) for td in rows[1].select('td')]
+            rate_star = " ".join([":star:"] * len(rows[2].select('img')))
+            _, final_score = [td.get_text(strip=True) for td in rows[3].select('td')]
+            matches_list.append(
+                [league, match, threeway, odds, rate_star, final_score]
+            )
+        return matches_list

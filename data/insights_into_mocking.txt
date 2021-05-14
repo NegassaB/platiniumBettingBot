@@ -1,0 +1,23 @@
+Insights
+
+In regards to mocking an external api, the unittest.mock module only helps you with the bare minimum of things. You still have to tell it what the side
+effects are, what to return, and how to act. A simple description might be:
+	1. you organize what the side effect might be into an enum, function etc
+and populate the mock using mock.side_effect.
+	2. you organize what the return might be into an enum, function etc and
+populate the mock using return
+	3. call_args literally shows you what method the mock object called with
+what arguments.
+This might serve as an example:
+"https://stackoverflow.com/questions/15753390/how-can-i-mock-requests-and-the-response/28507806#64991421"
+
+in regards to the testing on the platiniumBettingTips:
+	1. get a response from the website,
+	2. save the details of the response object to a file
+	3. create a mock that will have the auto_specs as well as the spec_set True, the return as the one you saved in the file
+	4. and test away.
+
+remember that whenever you act on a mock it always returns a mock, thus when you call table_exists
+	on the mock it returns true and continues on executing the code. What you need to do is find a way to make
+    mock_db as realistic as possible by populating it with whatever you're testing and the proceed from that.
+    todo find a way to get a full db into the mock
