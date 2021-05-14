@@ -91,7 +91,7 @@ class Cooker():
             [List]: named viptips_match_list that contains lists. Each list inside viptips_match_list
                     represents one match found in the website.
         """
-        viptips_match_list = list()
+        matches_list = list()
         self.get_sauce()
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html5lib')
 
@@ -101,7 +101,7 @@ class Cooker():
             match, threeway, odds = [td.get_text(strip=True) for td in rows[1].select('td')]
             rate_star = " ".join([":star:"] * len(rows[2].select('img')))
             _, final_score = [td.get_text(strip=True) for td in rows[3].select('td')]
-            viptips_match_list.append(
+            matches_list.append(
                 [league, match, threeway, odds, rate_star, final_score]
             )
-        return viptips_match_list
+        return matches_list
