@@ -70,7 +70,8 @@ async def send_msg_when_start(event):
         await event.respond(
             "you are not allowed to use this bot, please checkout the group instead good bye"
         )
-
+    gadd = await bot.get_entity(event.sender_id)
+    await bot.send_message(gadd, "what Gadd?")
     # cooker = Cooker(url_dict[0])
     # cooker.get_sauce()  # perhaps change this to await
     # tables = cooker.cook_sauce()
