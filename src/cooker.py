@@ -102,7 +102,7 @@ class Cooker():
             rows = table.select('tr')
             league = unicodedata.normalize("NFKD", rows[0].get_text(strip=True))
             match, threeway, odds = [
-                unicodedata.unicodedata.normalize(
+                unicodedata.normalize(
                     "NFKD",
                     td.get_text(strip=True)
                 ) for td in rows[1].select('td')
