@@ -9,6 +9,7 @@ from telethon import (
     )
 
 from cooker import (Cooker)
+from freezer import Freezer
 
 # enable logging
 logging.basicConfig(
@@ -24,30 +25,58 @@ url_dict = {
     0: "https://xxviptips.blogspot.com/",
     1: "https://hsitoriiquebet.blogspot.com/",
     2: "https://xxgoldtips.blogspot.com/",
-    3: "https://xxcombotips.blogspot.com/"
+    3: "https://xxcombotips.blogspot.com/"  # fix: won't work, avoid using till fixed
 }
 
 config = configparser.ConfigParser()
 config.read('data/.conbt.ini')
 
-api_id = config['Telegram']['api_id']
-api_hash = config['Telegram']['api_hash']
+bot_api_id = config['Telegram']['bot_api_id']
+bot_api_hash = config['Telegram']['bot_api_hash']
 bot_token = config['Telegram']['bot_token']
+platinium_channel_id = config['Telegram']['platinium_channel_id']
 
-bot = TelegramClient('platinium', api_id, api_hash).start(bot_token=bot_token)
+bot = TelegramClient(
+    'platinium',
+    bot_api_id,
+    bot_api_hash
+).start(bot_token=bot_token)
 
 
-@bot.on(events.NewMessage(pattern="/start"))
+async def main():
+    platinium_channel = await bot.get_entity(int(platinium_channel_id))
+    vip_cook = Cooker(url_dict[0])
+    total_matches = vip_cook.cook_sauce()
+    # bot.parse_mode = "md"
+    for match in total_matches:
+        # todo: find a remove characters like \u \xa0
+        # todo: build the markdown table here and finally send it
+        await bot.send_message(platinium_channel, str(match))
+    # await bot.send_message(platinium_channel, "what is up nigggaaar")
+
+
+def get_today_viptips():
+    vip_cook = Cooker(url_dict[0])
+    res = vip_cook.cook_recipe()
+
+
+async def post_today_viptips():
+    pass
+
+
+@bot.on(events.NewMessage)
 async def send_msg_when_start(event):
-    ngx = await bot.get_entity('@Negassa_B')
-    if event.sender_id != ngx.id:
-        await event.respond("you are not allowed to use this bot, good bye")
-    else:
-        cooker = Cooker(url_dict[0])
-        cooker.get_sauce()  # perhaps change this to await
-        tables = cooker.cook_sauce()
-        one_table = tables.pop()
-        await event.respond(one_table, parse_mode='HTML')
+    if event.sender_id != 355355326:
+        await event.respond(
+            "you are not allowed to use this bot, please checkout the group instead good bye"
+        )
+
+    # cooker = Cooker(url_dict[0])
+    # cooker.get_sauce()  # perhaps change this to await
+    # tables = cooker.cook_sauce()
+    # one_table = tables.pop()
+    # await event.respond(one_table, parse_mode='HTML')
 
 with bot:
-    bot.run_until_disconnected()
+    bot.loop.run_until_complete(main())
+    # bot.run_until_disconnected()

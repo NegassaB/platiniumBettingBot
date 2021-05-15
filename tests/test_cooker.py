@@ -1,6 +1,6 @@
 
 import pickle
-from typing import List
+from typing import Dict, List
 import unittest
 from unittest.mock import (MagicMock, Mock, patch)
 
@@ -113,7 +113,10 @@ class CookerTestSuites(unittest.TestCase):
             three_res = res2.pop()
             four_res = res3.pop()
 
-            self.assertIsInstance(one_res, List)
+            # self.assertIsInstance(one_res, List)
+            self.assertIsInstance(one_res, Dict)
             # self.assertIsInstance(two_res, List)
-            self.assertIsInstance(three_res, List)
-            self.assertIsInstance(four_res, List)
+            # self.assertIsInstance(three_res, List)
+            self.assertIsInstance(three_res, Dict)
+            # self.assertIsInstance(four_res, List)
+            self.assertIsInstance(four_res, Dict)
