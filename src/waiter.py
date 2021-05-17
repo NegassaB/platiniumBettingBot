@@ -8,6 +8,8 @@ from telethon import (
     Button
     )
 
+import markdown_strings
+
 from cooker import (Cooker)
 from freezer import Freezer
 
@@ -45,19 +47,33 @@ bot = TelegramClient(
 
 async def main():
     platinium_channel = await bot.get_entity(int(platinium_channel_id))
-    vip_cook = Cooker(url_dict[0])
-    total_matches = vip_cook.cook_sauce()
-    # bot.parse_mode = "md"
-    for match in total_matches:
-        # todo: find a remove characters like \u \xa0
-        # todo: build the markdown table here and finally send it
-        await bot.send_message(platinium_channel, str(match))
+    matches_table = get_today_viptips()
+    print(matches_table)
+    await bot.send_message(platinium_channel, matches_table, parse_mode="markdown")
     # await bot.send_message(platinium_channel, "what is up nigggaaar")
 
 
 def get_today_viptips():
     vip_cook = Cooker(url_dict[0])
-    res = vip_cook.cook_recipe()
+    total_matches = vip_cook.cook_sauce()
+
+    match_table = markdown_strings.table_row(
+        ["league & time", "match", "threeway", "odds", "rating", "final result"]
+    )
+    match_table = "".join(
+        [
+            match_table, "\n", markdown_strings.table_delimiter_row(
+                6,
+                column_lengths=[20, 20, 10, 10, 30, 3]
+            )
+        ]
+    )
+
+    for match in total_matches:
+        match_table = "".join([match_table, "\n", markdown_strings.table_row(match)])
+    # match_table = ["".join([match_table, "\n", markdown_strings.table_row(match)]) for match in total_matches]
+
+    return match_table
 
 
 async def post_today_viptips():
