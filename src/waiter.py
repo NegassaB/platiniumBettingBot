@@ -8,8 +8,6 @@ from telethon import (
     Button
     )
 
-import markdown_strings
-
 from cooker import (Cooker)
 from freezer import Freezer
 
@@ -68,7 +66,7 @@ def get_today_viptips():
     match_table = "".join([match_table, "\n", separator])
 
     for match in total_matches:
-        match_table = "".join([match_table, "\n", "```", str(match), ", ", "```"])
+        match_table = "".join([match_table, "\n", "```", str(match), ", ", "```\n"])
 
     return match_table
 
