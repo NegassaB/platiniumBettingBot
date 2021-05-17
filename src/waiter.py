@@ -44,12 +44,18 @@ bot = TelegramClient(
     bot_api_hash
 ).start(bot_token=bot_token)
 
+"""
+todo:
+        [ ] - run post_today_tips everyday @ 5:00
+        [ ] - run post_today_results everyday @ 3:00
+"""
+
 
 async def main():
     platinium_channel = await bot.get_entity(int(platinium_channel_id))
     matches_table = get_today_viptips()
-    print(matches_table)
-    await bot.send_message(platinium_channel, matches_table, parse_mode="markdown")
+    bot.parse_mode = "md"
+    await bot.send_message(platinium_channel, matches_table)
     # await bot.send_message(platinium_channel, "what is up nigggaaar")
 
 
@@ -57,21 +63,12 @@ def get_today_viptips():
     vip_cook = Cooker(url_dict[0])
     total_matches = vip_cook.cook_sauce()
 
-    match_table = markdown_strings.table_row(
-        ["league & time", "match", "threeway", "odds", "rating", "final result"]
-    )
-    match_table = "".join(
-        [
-            match_table, "\n", markdown_strings.table_delimiter_row(
-                6,
-                column_lengths=[20, 20, 10, 10, 30, 3]
-            )
-        ]
-    )
+    match_table = "**League & Time | Match | Threeway | Odds | Rating | Final result**"
+    separator = "".join(["-"] * 105)
+    match_table = "".join([match_table, "\n", separator])
 
     for match in total_matches:
-        match_table = "".join([match_table, "\n", markdown_strings.table_row(match)])
-    # match_table = ["".join([match_table, "\n", markdown_strings.table_row(match)]) for match in total_matches]
+        match_table = "".join([match_table, "\n", "```", str(match), ", ", "```"])
 
     return match_table
 
@@ -83,16 +80,11 @@ async def post_today_viptips():
 @bot.on(events.NewMessage)
 async def send_msg_when_start(event):
     if event.sender_id != 355355326:
-        await event.respond(
-            "you are not allowed to use this bot, please checkout the group instead good bye"
-        )
+        msg = "you are not allowed to use this bot,\
+            please checkout the group https://t.me/joinchat/SkEhcPc2yx_Wmh7S instead good bye"
+        await event.respond(msg)
     gadd = await bot.get_entity(event.sender_id)
     await bot.send_message(gadd, "what Gadd?")
-    # cooker = Cooker(url_dict[0])
-    # cooker.get_sauce()  # perhaps change this to await
-    # tables = cooker.cook_sauce()
-    # one_table = tables.pop()
-    # await event.respond(one_table, parse_mode='HTML')
 
 with bot:
     bot.loop.run_until_complete(main())

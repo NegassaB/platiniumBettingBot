@@ -107,7 +107,7 @@ class Cooker():
                     td.get_text(strip=True)
                 ) for td in rows[1].select('td')
             ]
-            rate_star = " ".join([":star:"] * len(rows[2].select('img')))
+            rate_star = " ".join(["⭐️"] * len(rows[2].select('img')))
             _, final_score = [
                 unicodedata.normalize(
                     "NFKD",

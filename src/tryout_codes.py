@@ -50,14 +50,15 @@ print(markdown_strings.table_from_rows([["1", "2", "3"], ["4", "5", "6"], ["7", 
 #     ["league & time", "match", "threeway", "odds", "rating", "final result"]
 # )
 match_table = "**League & Time | Match | Threeway | Odds | Rating | Final result**"
-separator = "_|—————————————————————————————|_"
+separator = "|——————————————————————-—————————-—|"
 match_table = "".join([match_table, "\n", separator])
 # match_table = "".join([match_table, "\n", markdown_strings.table_delimiter_row(6, column_lengths=[20, 20, 10, 10, 30, 5])])
 for match in table_data:
-    match_table = "".join([match_table, "\n", str(match), ", "])
+    match_table = "".join([match_table, "\n", "```", str(match), ", ", "```"])
 
 match_table = ["".join([match_table, "\n", markdown_strings.table_row(match)]) for match in table_data]
-print(f"```{match_table}```")
+print(f"{match_table}")
+match_table = None
 
 for match in table_data:
     for match_detail in match:
