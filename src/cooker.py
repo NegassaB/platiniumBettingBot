@@ -1,10 +1,13 @@
 import bs4 as bs
 import requests
 from requests import exceptions
+
 import logging
+import unicodedata
 
 # enable logging
 logging.basicConfig(
+    # filename=f"log {__name__} PlatiniumBot.log",
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -15,13 +18,13 @@ logger = logging.getLogger(__name__)
 class Cooker():
     """
     todo:
-        [ ] - request.get the url data
-        [ ] - get the sauce
-        [ ] - gather all the tables from the sauce
-        [ ] - gather all the rows
-        [ ] - find a way to identify the td with the stars
-        [ ] - count the number of star imgs inside the td with the stars
-        [ ] - return the table
+        [x] - request.get the url data
+        [x] - get the sauce
+        [x] - gather all the tables from the sauce
+        [x] - gather all the rows
+        [x] - find a way to identify the td with the stars
+        [x] - count the number of star imgs inside the td with the stars
+        [x] - return the table -- update -- return the list of data instead of the table
     doc:
     Cooker [summary]
 
@@ -68,7 +71,7 @@ class Cooker():
             "User-Agent": agent_str
         }
         try:
-            self.sauce = requests.get(self.source_url, headers=req_headers)
+            self.sauce = requests.get(self.source_url)
             self.sauce.raise_for_status()
         except (
             exceptions.ConnectionError,
@@ -95,13 +98,28 @@ class Cooker():
         self.get_sauce()
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html5lib')
 
-        for table in self.soup.select('table'):
+        # we assumed that they will always post 12 tables in both viptips & history
+        for table in self.soup.select('table', limit=12):
             rows = table.select('tr')
-            league = rows[0].get_text(strip=True)
-            match, threeway, odds = [td.get_text(strip=True) for td in rows[1].select('td')]
-            rate_star = " ".join([":star:"] * len(rows[2].select('img')))
-            _, final_score = [td.get_text(strip=True) for td in rows[3].select('td')]
+            league = unicodedata.normalize("NFKD", rows[0].get_text(strip=True))
+            match, threeway, odds = [
+                unicodedata.normalize(
+                    "NFKD",
+                    td.get_text(strip=True)
+                ) for td in rows[1].select('td')
+            ]
+            rate_star = " ".join(["⭐️"] * len(rows[2].select('img')))
+            _, final_score = [
+                unicodedata.normalize(
+                    "NFKD",
+                    td.get_text(strip=True)
+                ) for td in rows[3].select('td')
+            ]
+
             matches_list.append(
                 [league, match, threeway, odds, rate_star, final_score]
             )
+            # matches_list.append(
+            #     {"league": league, "match": match, "threeway": threeway, "odds": odds, "rating": rate_star, "final_score": final_score}
+            # )
         return matches_list

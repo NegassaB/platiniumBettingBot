@@ -9,6 +9,7 @@ from telethon import (
     )
 
 from cooker import (Cooker)
+from freezer import Freezer
 
 # enable logging
 logging.basicConfig(
@@ -24,30 +25,78 @@ url_dict = {
     0: "https://xxviptips.blogspot.com/",
     1: "https://hsitoriiquebet.blogspot.com/",
     2: "https://xxgoldtips.blogspot.com/",
-    3: "https://xxcombotips.blogspot.com/"
+    3: "https://xxcombotips.blogspot.com/"  # fix: site has a different format, won't work, avoid using till fixed
 }
 
 config = configparser.ConfigParser()
 config.read('data/.conbt.ini')
 
-api_id = config['Telegram']['api_id']
-api_hash = config['Telegram']['api_hash']
+bot_api_id = config['Telegram']['bot_api_id']
+bot_api_hash = config['Telegram']['bot_api_hash']
 bot_token = config['Telegram']['bot_token']
+platinium_channel_id = config['Telegram']['platinium_channel_id']
 
-bot = TelegramClient('platinium', api_id, api_hash).start(bot_token=bot_token)
+bot = TelegramClient(
+    'platinium',
+    bot_api_id,
+    bot_api_hash
+).start(bot_token=bot_token)
+
+"""
+todo:
+        [ ] - run post_today_tips everyday @ 5:00
+        [ ] - run post_today_results everyday @ 3:00
+"""
 
 
-@bot.on(events.NewMessage(pattern="/start"))
+async def main():
+    platinium_channel = await bot.get_entity(int(platinium_channel_id))
+    matches_table = get_today_viptips()
+    bot.parse_mode = "md"
+    await bot.send_message(platinium_channel, matches_table)
+    # await bot.send_message(platinium_channel, "what is up nigggaaar")
+
+
+def get_today_viptips():
+    vip_cook = Cooker(url_dict[0])
+    total_matches = vip_cook.cook_sauce()
+
+    return extract_and_generate_markdown_match_table(total_matches)
+
+
+def get_history_viptips():
+    history_cook = Cooker(url_dict[1])
+    total_matches = history_cook.cook_sauce()
+
+    return extract_and_generate_markdown_match_table(total_matches)
+
+
+def extract_and_generate_markdown_match_table(total_matches):
+    match_table = "**| League & Time | Match | Threeway | Odds | Rating | Final result |**"
+    separator = "".join(["-"] * 105)
+    match_table = "".join([match_table, "\n", separator])
+    for match in total_matches:
+        match_table = "".join([match_table, "\n", "```", str(match), ", ", "```\n"])
+    return match_table
+
+
+async def post_today_viptips():
+    platinium_channel = await bot.get_entity(int(platinium_channel_id))
+    matches_table = get_today_viptips()
+    bot.parse_mode = "md"
+    await bot.send_message(platinium_channel, matches_table)
+    pass
+
+
+@bot.on(events.NewMessage)
 async def send_msg_when_start(event):
-    ngx = await bot.get_entity('@Negassa_B')
-    if event.sender_id != ngx.id:
-        await event.respond("you are not allowed to use this bot, good bye")
-    else:
-        cooker = Cooker(url_dict[0])
-        cooker.get_sauce()  # perhaps change this to await
-        tables = cooker.cook_sauce()
-        one_table = tables.pop()
-        await event.respond(one_table, parse_mode='HTML')
+    if event.sender_id != 355355326:
+        msg = "you are not allowed to use this bot,\
+            please checkout the group https://t.me/joinchat/SkEhcPc2yx_Wmh7S instead. Good bye."
+        await event.respond(msg)
+    gadd = await bot.get_entity(event.sender_id)
+    await bot.send_message(gadd, "what Gadd?")
 
 with bot:
-    bot.run_until_disconnected()
+    bot.loop.run_until_complete(main())
+    # bot.run_until_disconnected()
