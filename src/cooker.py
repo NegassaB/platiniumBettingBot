@@ -98,7 +98,8 @@ class Cooker():
         self.get_sauce()
         self.soup = bs.BeautifulSoup(self.sauce.content, 'html5lib')
 
-        for table in self.soup.select('table'):
+        # we assumed that they will always post 12 tables in both viptips & history
+        for table in self.soup.select('table', limit=12):
             rows = table.select('tr')
             league = unicodedata.normalize("NFKD", rows[0].get_text(strip=True))
             match, threeway, odds = [

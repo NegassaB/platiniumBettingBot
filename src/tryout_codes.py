@@ -2,7 +2,6 @@ import pickle
 import unicodedata
 import bs4 as bs
 import requests
-import markdown_strings
 
 v_file = open('data/pickled_data/pickled_viptips.xyz', 'rb')
 v_pickled = pickle.load(v_file)
@@ -16,9 +15,11 @@ history = bs.BeautifulSoup(h_pickled.content, "html5lib")
 # actual_vip_sauce = bs.BeautifulSoup(actual_vip_site.content, "html5lib")
 table_data = []
 
-# for table in history.select("table"):
-for table in viptips.select("table"):
+for table in history.select("table", limit=12):
+    print(table)
 # for table in actual_vip_sauce.select("table"):
+# for table in viptips.select("table"):
+#     print(table)
     rows = table.select("tr")
     league = unicodedata.normalize("NFKD", rows[0].get_text(strip=True))
     match, info1, info2 = [unicodedata.normalize("NFKD", td.get_text(strip=True)) for td in rows[1].select("td")]
@@ -44,7 +45,7 @@ for match in table_data:
     if "\xa0" in temp:
         print(temp)
 
-print(markdown_strings.table_from_rows([["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]))
+# print(markdown_strings.table_from_rows([["1", "2", "3"], ["4", "5", "6"], ["7", "8", "9"]]))
 
 # match_table = markdown_strings.table_row(
 #     ["league & time", "match", "threeway", "odds", "rating", "final result"]
@@ -56,26 +57,25 @@ match_table = "".join([match_table, "\n", separator])
 for match in table_data:
     match_table = "".join([match_table, "\n", "```", str(match), ", ", "```"])
 
-match_table = ["".join([match_table, "\n", markdown_strings.table_row(match)]) for match in table_data]
+# match_table = ["".join([match_table, "\n", markdown_strings.table_row(match)]) for match in table_data]
 print(f"{match_table}")
 match_table = None
 
-for match in table_data:
-    for match_detail in match:
-        if "\xa0" in match_detail:
-            match_detail = unicodedata.normalize('NFKD', match_detail)
-    match_table = "".join([match_table, "\n", markdown_strings.table_row(match)])
-        # if unicodedata.is_normalized('NFD', match_detail):
-        #     print(match_detail)
-            # new_match_detail = unicodedata.normalize("\xa0", match_detail)
-            # print(new_match_detail)
+# for match in table_data:
+#     for match_detail in match:
+#         if "\xa0" in match_detail:
+#             match_detail = unicodedata.normalize('NFKD', match_detail)
+#     match_table = "".join([match_table, "\n", markdown_strings.table_row(match)])
+#         # if unicodedata.is_normalized('NFD', match_detail):
+#         #     print(match_detail)
+#             # new_match_detail = unicodedata.normalize("\xa0", match_detail)
+#             # print(new_match_detail)
 
-print(match_table)
 
-markdown_strings.header("main title", 1)
+# markdown_strings.header("main title", 1)
 
-table = markdown_strings.table_row(["league", "match", "threeway", "odds", "rating", "final result"])
-table = table + markdown_strings.table_delimiter_row(6, column_lengths=[6, 6, 6, 6, 6, 20])
-print(table)
+# table = markdown_strings.table_row(["league", "match", "threeway", "odds", "rating", "final result"])
+# table = table + markdown_strings.table_delimiter_row(6, column_lengths=[6, 6, 6, 6, 6, 20])
+# print(table)
 
-markdown_strings.table([["1", "2", "3"], ["4", "5", "6"]])
+# markdown_strings.table([["1", "2", "3"], ["4", "5", "6"]])
