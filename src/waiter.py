@@ -3,9 +3,7 @@ import configparser
 
 from telethon import (
     TelegramClient,
-    errors,
     events,
-    Button
     )
 
 from cooker import (Cooker)
@@ -42,19 +40,20 @@ bot = TelegramClient(
     bot_api_hash
 ).start(bot_token=bot_token)
 
+bot.parse_mode = "md"
+
 """
 todo:
         [ ] - run post_today_tips everyday @ 5:00
         [ ] - run post_today_results everyday @ 3:00
+        [x] - store the message id so as to reply to that when results are posted
 """
 
 
 async def main():
     platinium_channel = await bot.get_entity(int(platinium_channel_id))
-    matches_table = get_today_viptips()
-    bot.parse_mode = "md"
-    await bot.send_message(platinium_channel, matches_table)
-    # await bot.send_message(platinium_channel, "what is up nigggaaar")
+    await post_today_viptips(platinium_channel)
+    await post_yesterday_results(platinium_channel)
 
 
 def get_today_viptips():
@@ -64,28 +63,45 @@ def get_today_viptips():
     return extract_and_generate_markdown_match_table(total_matches)
 
 
-def get_history_viptips():
-    history_cook = Cooker(url_dict[1])
-    total_matches = history_cook.cook_sauce()
+def get_viptips_results():
+    viptips_result_cook = Cooker(url_dict[1])
+    total_matches = viptips_result_cook.cook_sauce()
 
     return extract_and_generate_markdown_match_table(total_matches)
 
 
 def extract_and_generate_markdown_match_table(total_matches):
     match_table = "**| League & Time | Match | Threeway | Odds | Rating | Final result |**"
-    separator = "".join(["-"] * 105)
+    separator = "".join(["-"] * 85)
     match_table = "".join([match_table, "\n", separator])
     for match in total_matches:
         match_table = "".join([match_table, "\n", "```", str(match), ", ", "```\n"])
     return match_table
 
 
-async def post_today_viptips():
-    platinium_channel = await bot.get_entity(int(platinium_channel_id))
+async def post_today_viptips(platinium_channel):
+    global last_posted_id
+
+    # fix: run in a different thread or coroutine (I don't think this doable cause it uses requests)
     matches_table = get_today_viptips()
-    bot.parse_mode = "md"
-    await bot.send_message(platinium_channel, matches_table)
-    pass
+
+    await bot.unpin_message(platinium_channel)
+
+    msg_viptips_posted = await bot.send_message(platinium_channel, matches_table)
+    await bot.pin_message(platinium_channel, msg_viptips_posted, notify=True)
+
+    last_posted_id = msg_viptips_posted.id
+
+
+async def post_yesterday_results(platinium_channel):
+    # fix: run in a different thread or coroutine (I don't think this doable cause it uses requests)
+    matches_table = get_viptips_results()
+
+    await bot.unpin_message(platinium_channel)
+
+    msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=last_posted_id)
+
+    await bot.pin_message(platinium_channel, msg_results_posted, notify=True)
 
 
 @bot.on(events.NewMessage)
