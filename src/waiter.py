@@ -76,15 +76,12 @@ async def main():
         logger.exception(f"hit exception -- {e}")
         await recall_main()
     else:
-        while 1:
-            right_now = datetime.datetime.now(tz=AA_TIMEZONE)
-            if right_now.time() == datetime.time(hour=3, tzinfo=AA_TIMEZONE) and not vipttips_posted:
-                logger.info("starting bot")
-                await post_today_viptips(platinium_channel, vipttips_posted)
-            elif right_now.time() == datetime.time(hour=6, tzinfo=AA_TIMEZONE) and vipttips_posted:
-                await post_yesterday_results(platinium_channel, vipttips_posted)
-            time.sleep(60)
-            logger.info("looping")
+        if not vipttips_posted:
+            await post_today_viptips(platinium_channel)
+        elif vipttips_posted:
+            await post_yesterday_results(platinium_channel)
+        else:
+            logger.info(f"viptips_posted is {viptips_posted}, IDK how I got here")
 
 
 def get_today_viptips():
@@ -110,9 +107,10 @@ def extract_and_generate_markdown_match_table(total_matches):
     return match_table
 
 
-async def post_today_viptips(platinium_channel, vipttips_posted):
+async def post_today_viptips(platinium_channel):
     logger.info("starting post_today_viptips")
     global last_posted_id
+    global vipttips_posted
 
     # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
     matches_table = get_today_viptips()
@@ -126,9 +124,12 @@ async def post_today_viptips(platinium_channel, vipttips_posted):
 
     vipttips_posted = True
 
+    logger.info("finished with post_today_viptips")
 
-async def post_yesterday_results(platinium_channel, vipttips_posted):
+
+async def post_yesterday_results(platinium_channel):
     logger.info("starting post_yesterday_results")
+    global vipttips_posted
     # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
     matches_table = get_viptips_results()
 
@@ -139,6 +140,24 @@ async def post_yesterday_results(platinium_channel, vipttips_posted):
     await bot.pin_message(platinium_channel, msg_results_posted, notify=True)
 
     vipttips_posted = False
+
+    logger.info("finished with post_yesterday_results")
+
+
+def time_check(right_now):
+    # fix vipttips_posted is not holding it's value
+    # if right_now.time() >= datetime.time(hour=3,minute=0,tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(hour=3, minute=5, tzinfo=AA_TIMEZONE) and not vipttips_posted:
+    if right_now.time() >= datetime.time(
+        hour=16, minute=11, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
+            hour=16, minute=13, tzinfo=AA_TIMEZONE) and not vipttips_posted:
+        return True
+    # elif right_now.time() >= datetime.time(hour=6,minute=0,tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(hour=6, minute=5, tzinfo=AA_TIMEZONE) and vipttips_posted:
+    elif right_now.time() >= datetime.time(
+        hour=15, minute=15, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
+            hour=16, minute=16, tzinfo=AA_TIMEZONE) and vipttips_posted:
+        return True
+    else:
+        return False
 
 
 @bot.on(events.NewMessage)
@@ -151,5 +170,11 @@ async def send_msg_when_start(event):
     await bot.send_message(gadd, "what Gadd?")
 
 with bot:
-    bot.loop.run_until_complete(main())
-    # bot.run_until_disconnected()
+    while 1:
+        right_now = datetime.datetime.now(tz=AA_TIMEZONE)
+        if time_check(right_now):
+            bot.loop.run_until_complete(main())
+        time.sleep(60)
+        logger.info("looping")
+        print(right_now.time())
+        # bot.run_until_disconnected()
