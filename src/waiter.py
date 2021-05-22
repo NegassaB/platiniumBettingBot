@@ -1,10 +1,14 @@
 import logging
 import configparser
+import time
+import datetime
 
+import pytz
 from telethon import (
     TelegramClient,
     events,
-    )
+    errors
+)
 
 from cooker import (Cooker)
 from freezer import Freezer
@@ -23,7 +27,7 @@ url_dict = {
     0: "https://xxviptips.blogspot.com/",
     1: "https://hsitoriiquebet.blogspot.com/",
     2: "https://xxgoldtips.blogspot.com/",
-    3: "https://xxcombotips.blogspot.com/"  # fix: site has a different format, won't work, avoid using till fixed
+    3: "https://xxcombotips.blogspot.com/"  # fixme: site has a different format, won't work, avoid using till fixed
 }
 
 config = configparser.ConfigParser()
@@ -34,26 +38,53 @@ bot_api_hash = config['Telegram']['bot_api_hash']
 bot_token = config['Telegram']['bot_token']
 platinium_channel_id = config['Telegram']['platinium_channel_id']
 
-bot = TelegramClient(
-    'platinium',
-    bot_api_id,
-    bot_api_hash
-).start(bot_token=bot_token)
-
-bot.parse_mode = "md"
+try:
+    bot = TelegramClient(
+        'platinium',
+        bot_api_id,
+        bot_api_hash
+    ).start(bot_token=bot_token)
+except Exception as e:
+    logger.exception(str(e), exc_info=True)
+else:
+    bot.parse_mode = "md"
+    AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
+    vipttips_posted = False
 
 """
-todo:
-        [ ] - run post_today_tips everyday @ 5:00
+todo:   [ ] - run post_today_tips everyday @ 5:00
         [ ] - run post_today_results everyday @ 3:00
         [x] - store the message id so as to reply to that when results are posted
 """
 
 
 async def main():
-    platinium_channel = await bot.get_entity(int(platinium_channel_id))
-    await post_today_viptips(platinium_channel)
-    await post_yesterday_results(platinium_channel)
+
+    async def recall_main():
+        logger.info("restarting main")
+        await main()
+
+    try:
+        platinium_channel = await bot.get_entity(int(platinium_channel_id))
+    except errors.FloodWaitError as fwe:
+        logger.error(f"hit the FloodWaitError, got sleep for {fwe.seconds} seconds")
+        time.sleep(fwe.seconds)
+    except errors.FloodError as fe:
+        logger.error(f"hit the FloodError with message -- {e.message}")
+        time.sleep(5000)
+    except Exception as e:
+        logger.exception(f"hit exception -- {e}")
+        await recall_main()
+    else:
+        while 1:
+            right_now = datetime.datetime.now(tz=AA_TIMEZONE)
+            if right_now.time() == datetime.time(hour=3, tzinfo=AA_TIMEZONE) and not vipttips_posted:
+                logger.info("starting bot")
+                await post_today_viptips(platinium_channel, vipttips_posted)
+            elif right_now.time() == datetime.time(hour=6, tzinfo=AA_TIMEZONE) and vipttips_posted:
+                await post_yesterday_results(platinium_channel, vipttips_posted)
+            time.sleep(60)
+            logger.info("looping")
 
 
 def get_today_viptips():
@@ -79,10 +110,11 @@ def extract_and_generate_markdown_match_table(total_matches):
     return match_table
 
 
-async def post_today_viptips(platinium_channel):
+async def post_today_viptips(platinium_channel, vipttips_posted):
+    logger.info("starting post_today_viptips")
     global last_posted_id
 
-    # fix: run in a different thread or coroutine (I don't think this doable cause it uses requests)
+    # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
     matches_table = get_today_viptips()
 
     await bot.unpin_message(platinium_channel)
@@ -92,9 +124,12 @@ async def post_today_viptips(platinium_channel):
 
     last_posted_id = msg_viptips_posted.id
 
+    vipttips_posted = True
 
-async def post_yesterday_results(platinium_channel):
-    # fix: run in a different thread or coroutine (I don't think this doable cause it uses requests)
+
+async def post_yesterday_results(platinium_channel, vipttips_posted):
+    logger.info("starting post_yesterday_results")
+    # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
     matches_table = get_viptips_results()
 
     await bot.unpin_message(platinium_channel)
@@ -102,6 +137,8 @@ async def post_yesterday_results(platinium_channel):
     msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=last_posted_id)
 
     await bot.pin_message(platinium_channel, msg_results_posted, notify=True)
+
+    vipttips_posted = False
 
 
 @bot.on(events.NewMessage)
