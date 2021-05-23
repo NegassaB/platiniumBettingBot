@@ -173,5 +173,5 @@ with bot:
         if time_check(right_now):
             bot.loop.run_until_complete(main())
         time.sleep(60)
-        logger.info("looping")
+        logger.info(f"{right_now} -- looping")
         # bot.run_until_disconnected()
