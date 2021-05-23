@@ -19,10 +19,9 @@ database_proxy = peewee.DatabaseProxy()
 
 class Freezer():
     """
-    todo:
-        [x]. update add_new_user() according to the new details
-        [x]. update get_bot_user() according to the new details
-        [x]. rename update_bot_user() to delete_bot_user(), actions are similar
+    todo:   [x]. update add_new_user() according to the new details
+            [x]. update get_bot_user() according to the new details
+            [x]. rename update_bot_user() to delete_bot_user(), actions are similar
 
     Freezer [summary]
 

@@ -1,7 +1,14 @@
 import pickle
 import unicodedata
 import bs4 as bs
+from peewee import ImproperlyConfigured
 import requests
+import datetime
+import pytz
+
+AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
+right_now = datetime.datetime.now(tz=AA_TIMEZONE)
+print(right_now)
 
 v_file = open('data/pickled_data/pickled_viptips.xyz', 'rb')
 v_pickled = pickle.load(v_file)
