@@ -52,7 +52,7 @@ else:
     vipttips_posted = False
 
 """
-todo:   [ ] - run post_today_tips everyday @ 5:00
+todo:   [x] - run post_today_tips everyday @ 5:00
         [x] - run post_today_results everyday @ 3:00
         [x] - store the message id so as to reply to that when results are posted
 """
@@ -174,5 +174,4 @@ with bot:
             bot.loop.run_until_complete(main())
         time.sleep(60)
         logger.info("looping")
-        print(right_now.time())
         # bot.run_until_disconnected()
