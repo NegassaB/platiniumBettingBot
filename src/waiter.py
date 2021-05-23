@@ -53,7 +53,7 @@ else:
 
 """
 todo:   [ ] - run post_today_tips everyday @ 5:00
-        [ ] - run post_today_results everyday @ 3:00
+        [x] - run post_today_results everyday @ 3:00
         [x] - store the message id so as to reply to that when results are posted
 """
 
@@ -146,15 +146,13 @@ async def post_yesterday_results(platinium_channel):
 
 def time_check(right_now):
     # fix vipttips_posted is not holding it's value
-    # if right_now.time() >= datetime.time(hour=3,minute=0,tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(hour=3, minute=5, tzinfo=AA_TIMEZONE) and not vipttips_posted:
     if right_now.time() >= datetime.time(
-        hour=16, minute=11, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
-            hour=16, minute=13, tzinfo=AA_TIMEZONE) and not vipttips_posted:
+        hour=9, minute=0, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
+            hour=9, minute=2, tzinfo=AA_TIMEZONE) and not vipttips_posted:
         return True
-    # elif right_now.time() >= datetime.time(hour=6,minute=0,tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(hour=6, minute=5, tzinfo=AA_TIMEZONE) and vipttips_posted:
     elif right_now.time() >= datetime.time(
-        hour=15, minute=15, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
-            hour=16, minute=16, tzinfo=AA_TIMEZONE) and vipttips_posted:
+        hour=12, minute=0, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
+            hour=12, minute=2, tzinfo=AA_TIMEZONE) and vipttips_posted:
         return True
     else:
         return False
