@@ -17,14 +17,13 @@ logger = logging.getLogger(__name__)
 
 class Cooker():
     """
-    todo:
-        [x] - request.get the url data
-        [x] - get the sauce
-        [x] - gather all the tables from the sauce
-        [x] - gather all the rows
-        [x] - find a way to identify the td with the stars
-        [x] - count the number of star imgs inside the td with the stars
-        [x] - return the table -- update -- return the list of data instead of the table
+    todo:   [x] - request.get the url data
+            [x] - get the sauce
+            [x] - gather all the tables from the sauce
+            [x] - gather all the rows
+            [x] - find a way to identify the td with the stars
+            [x] - count the number of star imgs inside the td with the stars
+            [x] - return the table -- update -- return the list of data instead of the table
     doc:
     Cooker [summary]
 
