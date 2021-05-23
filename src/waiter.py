@@ -65,7 +65,8 @@ async def main():
         await main()
 
     try:
-        platinium_channel = await bot.get_entity(int(platinium_channel_id))
+        # platinium_channel = await bot.get_entity(int(platinium_channel_id))
+        platinium_channel = await bot.get_entity("https://t.me/platiniumbettingtips")
     except errors.FloodWaitError as fwe:
         logger.error(f"hit the FloodWaitError, got sleep for {fwe.seconds} seconds")
         time.sleep(fwe.seconds)
