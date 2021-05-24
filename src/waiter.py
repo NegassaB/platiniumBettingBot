@@ -101,7 +101,7 @@ def get_viptips_results():
 
 def extract_and_generate_markdown_match_table(total_matches):
     match_table = "**| League & Time | Match | Threeway | Odds | Rating | Final result |**"
-    separator = "".join(["-"] * 85)
+    separator = "".join(["-"] * 60)
     match_table = "".join([match_table, "\n", separator])
     for match in total_matches:
         match_table = "".join([match_table, "\n", "```", str(match), ", ", "```\n"])
@@ -118,6 +118,22 @@ async def post_today_viptips(platinium_channel):
 
     await bot.unpin_message(platinium_channel)
 
+    # warning_msg = "ውድ ደንበኞቻችን፤ ስማርት ሁኑ እና ሁሉንም ጨዋታዎች በ አንድ ትኬት ላይ ሳይሆን በ 3 ወይም በ 4 ትኬት ላይ ይስሩት።"
+    # warning_msg = "".join(
+    #     [
+    #         warning_msg,
+    #         "\n\nQaalii maamiloota keenya, smaart ta'aa fi taphoota hundumtun tikeetin tokko irra otto hin taane,",
+    #         "tikeetoota 3 yookin 4 irra hojedha."
+    #     ],
+    # )
+    # warning_msg = "".join(
+    #     [
+    #         warning_msg, "\n\nDear customers, be smart and don't bet the entire tips in one ticket. ",
+    #         "Instead break them down in to 3 or 4 tickets."
+    #     ]
+    # )
+
+    # await bot.send_message(platinium_channel, warning_msg)
     msg_viptips_posted = await bot.send_message(platinium_channel, matches_table)
     await bot.pin_message(platinium_channel, msg_viptips_posted, notify=True)
 
