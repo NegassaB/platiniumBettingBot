@@ -24,10 +24,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 url_dict = {
-    0: "https://xxviptips.blogspot.com/",
-    1: "https://hsitoriiquebet.blogspot.com/",
-    2: "https://xxgoldtips.blogspot.com/",
-    3: "https://xxcombotips.blogspot.com/"  # fixme: site has a different format, won't work, avoid using till fixed
+    0: "https://xxviptips.blogspot.com//?m=0",
+    1: "https://hsitoriiquebet.blogspot.com/?m=1",
+    2: "https://xxgoldtips.blogspot.com/?m=0",
+    3: "https://xxcombotips.blogspot.com/?m=0"  # fixme: site has a different format, won't work, avoid using till fixed
 }
 
 config = configparser.ConfigParser()

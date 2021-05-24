@@ -12,8 +12,7 @@ my name/first_name = "Negassa"
 phone(maybe) = +251911985365
 
 New sites:
-1.https://xxviptips.blogspot.com/
-2.https://liveeresultas.blogspot.com/
-3.https://hsitoriiquebet.blogspot.com/
-4.https://xxgoldtips.blogspot.com/
-5.https://xxcombotips.blogspot.com/
+0: "https://xxviptips.blogspot.com//?m=0",
+1: "https://hsitoriiquebet.blogspot.com/?m=1",
+2: "https://xxgoldtips.blogspot.com/?m=0",
+3: "https://xxcombotips.blogspot.com/?m=0"
