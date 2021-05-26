@@ -101,7 +101,7 @@ def get_viptips_results():
 
 def extract_and_generate_markdown_match_table(total_matches):
     match_table = "**| League & Time | Match | Threeway | Odds | Rating | Final result |**"
-    separator = "".join(["-"] * 60)
+    separator = "".join(["-"] * 80)
     match_table = "".join([match_table, "\n", separator])
     for match in total_matches:
         match_table = "".join([match_table, "\n", "```", str(match), ", ", "```\n"])
@@ -122,7 +122,7 @@ async def post_today_viptips(platinium_channel):
     # warning_msg = "".join(
     #     [
     #         warning_msg,
-    #         "\n\nQaalii maamiloota keenya, smaart ta'aa fi taphoota hundumtun tikeetin tokko irra otto hin taane,",
+    #         "\n\nQaalii maamiloota keenya, smaart ta'aa fi taphoota hundumtun tikeetin toffsetokko irra otto hin taane,",
     #         "tikeetoota 3 yookin 4 irra hojedha."
     #     ],
     # )
@@ -132,8 +132,15 @@ async def post_today_viptips(platinium_channel):
     #         "Instead break them down in to 3 or 4 tickets."
     #     ]
     # )
+    warning_msg = "".join(
+        [
+            "Dear customers, be smart and don't bet the entire tips in one ticket. ",
+            "Instead break them down in to 3 or 4 tickets."
+        ]
+    )
 
-    # await bot.send_message(platinium_channel, warning_msg)
+    await bot.send_message(platinium_channel, warning_msg)
+    time.sleep(2)
     msg_viptips_posted = await bot.send_message(platinium_channel, matches_table)
     await bot.pin_message(platinium_channel, msg_viptips_posted, notify=True)
 
@@ -152,11 +159,31 @@ async def post_yesterday_results(platinium_channel):
 
     await bot.unpin_message(platinium_channel)
 
-    msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=last_posted_id)
+    yesterday_posted_id = await bot.get_messages(
+        platinium_channel,
+        limit=1,
+        offset_date=datetime.datetime.today(),
+        offset_id=last_posted_id,
+        from_user=bot
+    )
+
+    msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=yesterday_posted_id)
 
     await bot.pin_message(platinium_channel, msg_results_posted, notify=True)
 
     vipttips_posted = False
+
+    time.sleep(2)
+
+    warning_msg = "".join(
+        [
+            "This application is only an informative tool and must be used just for fun.\n",
+            "We post various sports analyze that represent our provider's opinion regarding\t",
+            "the eventual outcome of those games. Till now we have a 70% accuracy."
+        ]
+    )
+
+    await bot.send_message(platinium_channel, warning_msg)
 
     logger.info("finished with post_yesterday_results")
 
