@@ -122,7 +122,7 @@ async def post_today_viptips(platinium_channel):
     # warning_msg = "".join(
     #     [
     #         warning_msg,
-    #         "\n\nQaalii maamiloota keenya, smaart ta'aa fi taphoota hundumtun tikeetin toffsetokko irra otto hin taane,",
+    #         "\n\nQaalii maamiloota keenya, smaart ta'aa fi taphoota hundumtun tikeetin tokko irra otto hin taane,",
     #         "tikeetoota 3 yookin 4 irra hojedha."
     #     ],
     # )
@@ -164,7 +164,7 @@ async def post_yesterday_results(platinium_channel):
         limit=1,
         offset_date=datetime.datetime.today(),
         offset_id=last_posted_id,
-        from_user=bot
+        from_user=bot.get_entity('me')
     )
 
     msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=yesterday_posted_id)
