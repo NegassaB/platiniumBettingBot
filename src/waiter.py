@@ -66,7 +66,7 @@ async def main():
 
     try:
         # platinium_channel = await bot.get_entity(int(platinium_channel_id))
-        platinium_channel = await bot.get_entity("https://t.me/platiniumbettingtips")
+        platinium_channel = await bot.get_input_entity("https://t.me/platiniumbettingtips")
     except errors.FloodWaitError as fwe:
         logger.error(f"hit the FloodWaitError, got sleep for {fwe.seconds} seconds")
         time.sleep(fwe.seconds)
@@ -164,7 +164,7 @@ async def post_yesterday_results(platinium_channel):
         limit=1,
         offset_date=datetime.datetime.today(),
         offset_id=last_posted_id,
-        from_user=bot.get_entity('me')
+        from_user=bot.get_input_entity('me')
     )
 
     msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=yesterday_posted_id)
