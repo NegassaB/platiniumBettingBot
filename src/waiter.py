@@ -50,6 +50,7 @@ else:
     bot.parse_mode = "md"
     AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
     vipttips_posted = False
+    queue_id = []
 
 """
 todo:   [x] - run post_today_tips everyday @ 5:00
@@ -71,7 +72,7 @@ async def main():
         logger.error(f"hit the FloodWaitError, got sleep for {fwe.seconds} seconds")
         time.sleep(fwe.seconds)
     except errors.FloodError as fe:
-        logger.error(f"hit the FloodError with message -- {e.message}")
+        logger.error(f"hit the FloodError with message -- {fe.message}")
         time.sleep(5000)
     except Exception as e:
         logger.exception(f"hit exception -- {e}")
@@ -82,7 +83,7 @@ async def main():
         elif vipttips_posted:
             await post_yesterday_results(platinium_channel)
         else:
-            logger.info(f"viptips_posted is {viptips_posted}, IDK how I got here")
+            logger.info(f"viptips_posted is {viptips_posted}, IDK how I got here nigga")
 
 
 def get_today_viptips():
@@ -110,7 +111,6 @@ def extract_and_generate_markdown_match_table(total_matches):
 
 async def post_today_viptips(platinium_channel):
     logger.info("starting post_today_viptips")
-    global last_posted_id
     global vipttips_posted
 
     # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
@@ -122,13 +122,13 @@ async def post_today_viptips(platinium_channel):
     # warning_msg = "".join(
     #     [
     #         warning_msg,
-    #         "\n\nQaalii maamiloota keenya, smaart ta'aa fi taphoota hundumtun tikeetin tokko irra otto hin taane,",
+    #         "\n\nQaalii hordoftoota keenya, smaart ta'aa fi taphoota hundumtun tikeetin tokko irra otto hin taane,",
     #         "tikeetoota 3 yookin 4 irra hojedha."
     #     ],
     # )
     # warning_msg = "".join(
     #     [
-    #         warning_msg, "\n\nDear customers, be smart and don't bet the entire tips in one ticket. ",
+    #         warning_msg, "\n\nDear followers, be smart and don't bet the entire tips in one ticket. ",
     #         "Instead break them down in to 3 or 4 tickets."
     #     ]
     # )
@@ -144,7 +144,7 @@ async def post_today_viptips(platinium_channel):
     msg_viptips_posted = await bot.send_message(platinium_channel, matches_table)
     await bot.pin_message(platinium_channel, msg_viptips_posted, notify=True)
 
-    last_posted_id = msg_viptips_posted.id
+    queue_id.append(msg_viptips_posted.id)
 
     vipttips_posted = True
 
@@ -159,15 +159,7 @@ async def post_yesterday_results(platinium_channel):
 
     await bot.unpin_message(platinium_channel)
 
-    yesterday_posted_id = await bot.get_messages(
-        platinium_channel,
-        limit=1,
-        offset_date=datetime.datetime.today(),
-        offset_id=last_posted_id,
-        from_user=bot.get_input_entity('me')
-    )
-
-    msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=yesterday_posted_id)
+    msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=queue_id.pop(0))
 
     await bot.pin_message(platinium_channel, msg_results_posted, notify=True)
 
@@ -178,7 +170,7 @@ async def post_yesterday_results(platinium_channel):
     warning_msg = "".join(
         [
             "This application is only an informative tool and must be used just for fun.\n",
-            "We post various sports analyze that represent our provider's opinion regarding\t",
+            "We post various sports analysis that represent our provider's opinion regarding\t",
             "the eventual outcome of those games. Till now we have a 70% accuracy."
         ]
     )
@@ -214,8 +206,8 @@ async def send_msg_when_start(event):
 with bot:
     while 1:
         right_now = datetime.datetime.now(tz=AA_TIMEZONE)
-        if time_check(right_now):
-            bot.loop.run_until_complete(main())
-        time.sleep(60)
+        # # if time_check(right_now):
+        # #     bot.loop.run_until_complete(main())
+        # # time.sleep(60)
+        # bot.loop.run_until_complete(main())
         logger.info(f"{right_now} -- looping")
-        # bot.run_until_disconnected()
