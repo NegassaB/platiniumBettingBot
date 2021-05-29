@@ -206,8 +206,8 @@ async def send_msg_when_start(event):
 with bot:
     while 1:
         right_now = datetime.datetime.now(tz=AA_TIMEZONE)
-        # # if time_check(right_now):
-        # #     bot.loop.run_until_complete(main())
-        # # time.sleep(60)
+        if time_check(right_now):
+            bot.loop.run_until_complete(main())
+        time.sleep(60)
         # bot.loop.run_until_complete(main())
         logger.info(f"{right_now} -- looping")
