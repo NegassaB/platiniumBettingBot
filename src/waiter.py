@@ -53,9 +53,9 @@ else:
     queue_id = []
 
 """
-todo:   [x] - run post_today_tips everyday @ 5:00
-        [x] - run post_today_results everyday @ 3:00
-        [x] - store the message id so as to reply to that when results are posted
+todo:
+        [ ] - retrieve and store users' telegram ids
+        [ ] - build the combo & golden tips provider using commands instead of posting on channel
 """
 
 
