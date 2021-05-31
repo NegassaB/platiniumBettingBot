@@ -49,8 +49,8 @@ except Exception as e:
 else:
     bot.parse_mode = "md"
     AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
-    vipttips_posted = False
     queue_id = []
+    queue_id.append(186)
 
 """
 todo:
@@ -78,31 +78,27 @@ async def main():
         logger.exception(f"hit exception -- {e}")
         await recall_main()
     else:
-        if not vipttips_posted:
-            await post_today_viptips(platinium_channel)
-        elif vipttips_posted:
-            await post_yesterday_results(platinium_channel)
-        else:
-            logger.info(f"viptips_posted is {viptips_posted}, IDK how I got here nigga")
+        await post_yesterday_results(platinium_channel)
+        time.sleep(3600)
+        await post_today_viptips(platinium_channel)
 
 
-def get_today_viptips():
-    vip_cook = Cooker(url_dict[0])
-    total_matches = vip_cook.cook_sauce()
-
-    return extract_and_generate_markdown_match_table(total_matches)
-
-
-def get_viptips_results():
-    viptips_result_cook = Cooker(url_dict[1])
-    total_matches = viptips_result_cook.cook_sauce()
+def get_tips_or_results(result_tips=None):
+    cooker = None
+    if result_tips == "viptips":
+        cooker = Cooker(url_dict[0])
+    elif result_tips == "goldtips":
+        cooker = Cooker(url_dict[2])
+    else:
+        cooker = Cooker(url_dict[1])
+    total_matches = cooker.cook_sauce()
 
     return extract_and_generate_markdown_match_table(total_matches)
 
 
 def extract_and_generate_markdown_match_table(total_matches):
     match_table = "**| League & Time | Match | Threeway | Odds | Rating | Final result |**"
-    separator = "".join(["-"] * 80)
+    separator = "".join(["-"] * 70)
     match_table = "".join([match_table, "\n", separator])
     for match in total_matches:
         match_table = "".join([match_table, "\n", "```", str(match), ", ", "```\n"])
@@ -111,14 +107,13 @@ def extract_and_generate_markdown_match_table(total_matches):
 
 async def post_today_viptips(platinium_channel):
     logger.info("starting post_today_viptips")
-    global vipttips_posted
 
     # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
-    matches_table = get_today_viptips()
+    matches_table = get_tips_or_results("viptips")
 
     await bot.unpin_message(platinium_channel)
 
-    # warning_msg = "ውድ ደንበኞቻችን፤ ስማርት ሁኑ እና ሁሉንም ጨዋታዎች በ አንድ ትኬት ላይ ሳይሆን በ 3 ወይም በ 4 ትኬት ላይ ይስሩት።"
+    # warning_msg = "ውድ ተከታዮቻችን፤ ስማርት ሁኑ እና ሁሉንም ጨዋታዎች በ አንድ ትኬት ላይ ሳይሆን በ 3 ወይም በ 4 ትኬት ላይ ይስሩት።"
     # warning_msg = "".join(
     #     [
     #         warning_msg,
@@ -134,7 +129,7 @@ async def post_today_viptips(platinium_channel):
     # )
     warning_msg = "".join(
         [
-            "Dear customers, be smart and don't bet the entire tips in one ticket. ",
+            "Dear followers, be smart and don't bet the entire tips in one ticket. ",
             "Instead break them down in to 3 or 4 tickets."
         ]
     )
@@ -146,24 +141,22 @@ async def post_today_viptips(platinium_channel):
 
     queue_id.append(msg_viptips_posted.id)
 
-    vipttips_posted = True
-
     logger.info("finished with post_today_viptips")
 
 
 async def post_yesterday_results(platinium_channel):
     logger.info("starting post_yesterday_results")
-    global vipttips_posted
     # fixme: run in a different thread or coroutine (I don't think this doable cause it uses requests)
-    matches_table = get_viptips_results()
+    matches_table = get_tips_or_results()
 
     await bot.unpin_message(platinium_channel)
 
-    msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=queue_id.pop(0))
+    if len(queue_id) == 0:
+        msg_results_posted = await bot.send_message(platinium_channel, matches_table)
+    else:
+        msg_results_posted = await bot.send_message(platinium_channel, matches_table, reply_to=queue_id.pop(0))
 
     await bot.pin_message(platinium_channel, msg_results_posted, notify=True)
-
-    vipttips_posted = False
 
     time.sleep(2)
 
@@ -181,14 +174,9 @@ async def post_yesterday_results(platinium_channel):
 
 
 def time_check(right_now):
-    # fix vipttips_posted is not holding it's value
     if right_now.time() >= datetime.time(
-        hour=13, minute=0, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
-            hour=13, minute=2, tzinfo=AA_TIMEZONE) and not vipttips_posted:
-        return True
-    elif right_now.time() >= datetime.time(
-        hour=12, minute=0, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
-            hour=12, minute=2, tzinfo=AA_TIMEZONE) and vipttips_posted:
+        hour=14, minute=0, tzinfo=AA_TIMEZONE) and right_now.time() <= datetime.time(
+            hour=14, minute=2, tzinfo=AA_TIMEZONE):
         return True
     else:
         return False
