@@ -79,6 +79,7 @@ async def main():
         await recall_main()
     else:
         await post_yesterday_results(platinium_channel)
+        logger.info("sleeping after post_yesterday_results")
         time.sleep(3600)
         await post_today_viptips(platinium_channel)
 
