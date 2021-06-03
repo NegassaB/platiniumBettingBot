@@ -50,7 +50,7 @@ else:
     bot.parse_mode = "md"
     AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
     queue_id = []
-    queue_id.append(186)
+    queue_id.append(213)
 
 """
 todo:
