@@ -50,7 +50,7 @@ else:
     bot.parse_mode = "md"
     AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
     queue_id = []
-    queue_id.append(186)
+    queue_id.append(213)
 
 """
 todo:
@@ -79,6 +79,7 @@ async def main():
         await recall_main()
     else:
         await post_yesterday_results(platinium_channel)
+        logger.info("sleeping after post_yesterday_results")
         time.sleep(3600)
         await post_today_viptips(platinium_channel)
 
