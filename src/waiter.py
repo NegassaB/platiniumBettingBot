@@ -24,8 +24,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 url_dict = {
-    0: "https://xxviptips.blogspot.com//?m=0",
-    1: "https://hsitoriiquebet.blogspot.com/?m=1",
+    0: "https://dailyviptipsx.blogspot.com/",
+    1: "https://statistiquesxx.blogspot.com/",
     2: "https://xxgoldtips.blogspot.com/?m=0",
     3: "https://xxcombotips.blogspot.com/?m=0"  # fixme: site has a different format, won't work, avoid using till fixed
 }
@@ -50,7 +50,7 @@ else:
     bot.parse_mode = "md"
     AA_TIMEZONE = pytz.timezone('Africa/Addis_Ababa')
     queue_id = []
-    queue_id.append(213)
+    queue_id.append(708)
 
 """
 todo:
