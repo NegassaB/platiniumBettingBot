@@ -20,12 +20,12 @@ class FreezerTestSuites(unittest.TestCase):
     """
 
     def setUp(self):
-        self.tlg_user_id = 355355326
+        self.tlg_user_id = 0000
         # self.tlg_username = None
-        self.tlg_username = "Gadd"
-        self.tlg_first_name = "Negassa"
+        self.tlg_username = "username"
+        self.tlg_first_name = "first name"
         # self.tlg_phone = None
-        self.tlg_phone = "+251911985365"
+        self.tlg_phone = "telephone number"
         self.tlg_active_status = False
         self.test_freezer_obj = Freezer(True)
         self.test_freezer_obj.open_freezer()
@@ -69,12 +69,12 @@ class FreezerTestSuites(unittest.TestCase):
 
 
 def add_user_for_testing(freezer_obj):
-    tg_user_id = 355355326
+    tg_user_id = 0000
     # tg_username = None
-    tg_username = "Gadd"
-    tg_first_name = "Negassa"
+    tg_username = "username"
+    tg_first_name = "firstname"
     # tg_phone = None
-    tg_phone = "+251911985365"
+    tg_phone = "telephone number"
     tlg_active_status = False
 
     if tg_username is None and tg_phone is None:

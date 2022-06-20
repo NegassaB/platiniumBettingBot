@@ -15,7 +15,7 @@ from freezer import Freezer
 
 # enable logging
 logging.basicConfig(
-    # filename=f"log {__name__} PlatiniumBot.log",
+    filename=f"log {__name__} PlatiniumBot.log",
     format='%(asctime)s - %(funcName)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
@@ -27,23 +27,24 @@ url_dict = {
     0: "https://dailyviptipsx.blogspot.com/",
     1: "https://statistiquesxx.blogspot.com/",
     2: "https://xxgoldtips.blogspot.com/?m=0",
-    3: "https://xxcombotips.blogspot.com/?m=0"  # fixme: site has a different format, won't work, avoid using till fixed
+    3: "https://xxcombotips.blogspot.com/?m=0"
 }
 
 config = configparser.ConfigParser()
 config.read('data/.conbt.ini')
 
-bot_api_id = config['Telegram']['bot_api_id']
-bot_api_hash = config['Telegram']['bot_api_hash']
-bot_token = config['Telegram']['bot_token']
-platinium_channel_id = config['Telegram']['platinium_channel_id']
+BOT_API_ID = config['Telegram']['bot_api_id']
+BOT_API_HASH = config['Telegram']['bot_api_hash']
+BOT_TOKEN = config['Telegram']['bot_token']
+CHANNEL_ID = config['Telegram']['channel_id']
+ADMIN_ID = config['Telegram']['admin_id']
 
 try:
     bot = TelegramClient(
         'platinium',
-        bot_api_id,
-        bot_api_hash
-    ).start(bot_token=bot_token)
+        BOT_API_ID,
+        BOT_API_HASH
+    ).start(bot_token=BOT_TOKEN)
 except Exception as e:
     logger.exception(str(e), exc_info=True)
 else:
@@ -114,20 +115,6 @@ async def post_today_viptips(platinium_channel):
 
     await bot.unpin_message(platinium_channel)
 
-    # warning_msg = "ውድ ተከታዮቻችን፤ ስማርት ሁኑ እና ሁሉንም ጨዋታዎች በ አንድ ትኬት ላይ ሳይሆን በ 3 ወይም በ 4 ትኬት ላይ ይስሩት።"
-    # warning_msg = "".join(
-    #     [
-    #         warning_msg,
-    #         "\n\nQaalii hordoftoota keenya, smaart ta'aa fi taphoota hundumtun tikeetin tokko irra otto hin taane,",
-    #         "tikeetoota 3 yookin 4 irra hojedha."
-    #     ],
-    # )
-    # warning_msg = "".join(
-    #     [
-    #         warning_msg, "\n\nDear followers, be smart and don't bet the entire tips in one ticket. ",
-    #         "Instead break them down in to 3 or 4 tickets."
-    #     ]
-    # )
     warning_msg = "".join(
         [
             "Dear followers, be smart and don't bet the entire tips in one ticket. ",
@@ -165,7 +152,7 @@ async def post_yesterday_results(platinium_channel):
         [
             "This application is only an informative tool and must be used just for fun.\n",
             "We post various sports analysis that represent our provider's opinion regarding\t",
-            "the eventual outcome of those games. Till now we have a 70% accuracy."
+            "the eventual outcome of those games."
         ]
     )
 
@@ -185,7 +172,7 @@ def time_check(right_now):
 
 @bot.on(events.NewMessage)
 async def send_msg_when_start(event):
-    if event.sender_id != 355355326:
+    if event.sender_id != ADMIN_ID:
         msg = "you are not allowed to use this bot,\
             please checkout the group https://t.me/joinchat/SkEhcPc2yx_Wmh7S instead. Good bye."
         await event.respond(msg)
