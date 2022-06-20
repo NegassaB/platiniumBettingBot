@@ -1,4 +1,4 @@
-# Betting tips scraper
+# Platinium Betting tips scraper
 
 This is the code for betting tips scraper from the following websites:
 
